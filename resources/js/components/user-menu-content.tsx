@@ -22,8 +22,20 @@ export function UserMenuContent({ user }: UserMenuContentProps) {
 
     const handleLogout = () => {
         cleanup();
-        router.flushAll();
-        toast.success('you have been logged out successfully');
+        
+        const logoutPromise = new Promise<void>((resolve) => {
+            router.flushAll();
+            // Small delay to show the loading state
+            setTimeout(() => {
+                resolve();
+            }, 500);
+        });
+
+        toast.promise(logoutPromise, {
+            loading: 'Logging out...',
+            success: 'You have been logged out successfully',
+            error: 'Failed to log out',
+        });
     };
 
     return (
