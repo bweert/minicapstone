@@ -63,7 +63,7 @@ export function ReceiptPreview({
         >
           {/* Header */}
           <div className="text-center space-y-2 pb-4 border-b-2 border-gray-800">
-            <h2 className="text-2xl font-bold">MY STORE</h2>
+            <h2 className="text-2xl font-bold">CELLUB</h2>
             <p className="text-xs text-gray-600">Professional Point of Sale</p>
             <p className="text-xs text-gray-600">Receipt #{transactionData.reference_number}</p>
             <p className="text-xs text-gray-600">{transactionData.timestamp}</p>

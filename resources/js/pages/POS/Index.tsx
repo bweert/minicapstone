@@ -1,8 +1,10 @@
 import AppLayout from '@/layouts/app-layout';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { usePage } from '@inertiajs/react';
 import { useCart } from '@/hooks/useCart';
 import { ProductGrid } from '@/components/POS/ProductGrid';
+import { ProductSearch } from '@/components/POS/ProductSearch';
+import { CategoryFilter } from '@/components/POS/CategoryFilter';
 import { ProductQuickView } from '@/components/POS/ProductQuickView';
 import { CartSidebar } from '@/components/POS/CartSidebar';
 import { MobileCartDrawer } from '@/components/POS/MobileCartDrawer';
@@ -38,6 +40,35 @@ export default function POSIndex() {
   const [receiptOpen, setReceiptOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [transactionData, setTransactionData] = useState<any>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+
+  // Extract unique categories
+  const categories = useMemo(() => {
+    const cats = new Set(products.map((p) => p.category).filter(Boolean) as string[]);
+    return Array.from(cats).sort();
+  }, [products]);
+
+  // Filter products by search and category
+  const filteredProducts = useMemo(() => {
+    return products.filter((product) => {
+      // Filter by category
+      if (selectedCategory && product.category !== selectedCategory) {
+        return false;
+      }
+
+      // Filter by search query (name or SKU)
+      if (searchQuery.trim()) {
+        const query = searchQuery.toLowerCase();
+        return (
+          product.name.toLowerCase().includes(query) ||
+          (product.sku && product.sku.toLowerCase().includes(query))
+        );
+      }
+
+      return true;
+    });
+  }, [products, searchQuery, selectedCategory]);
 
   // Calculations
   const subtotal = getSubtotal();
@@ -186,12 +217,22 @@ export default function POSIndex() {
               </div>
             </div>
 
+            {/* Search Bar */}
+            <ProductSearch searchQuery={searchQuery} onSearchChange={setSearchQuery} />
+
+            {/* Category Filter */}
+            <CategoryFilter
+              categories={categories}
+              selectedCategory={selectedCategory}
+              onCategoryChange={setSelectedCategory}
+            />
+
             {/* Products Grid */}
-            {products.length > 0 ? (
-              <ProductGrid products={products} onQuickView={handleQuickView} />
+            {filteredProducts.length > 0 ? (
+              <ProductGrid products={filteredProducts} onQuickView={handleQuickView} />
             ) : (
               <div className="text-center py-12">
-                <p className="text-gray-500 text-lg">No products available</p>
+                <p className="text-gray-500 text-lg">No products found matching your search</p>
               </div>
             )}
           </div>

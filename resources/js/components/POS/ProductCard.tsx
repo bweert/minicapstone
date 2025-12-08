@@ -22,7 +22,7 @@ export function ProductCard({ product, onQuickView }: ProductCardProps) {
   return (
     <Card className="overflow-hidden hover:shadow-xl transition-all cursor-pointer h-full flex flex-col">
       <CardContent
-        className="p-0 flex-1 flex items-center justify-center bg-gray-100 relative group overflow-hidden min-h-48"
+        className="p-0 flex-1 flex items-center justify-center bg-gray-100 relative group overflow-hidden h-40"
         onClick={() => onQuickView(product)}
       >
         {product.image ? (
@@ -55,7 +55,7 @@ export function ProductCard({ product, onQuickView }: ProductCardProps) {
 
         <div className="w-full flex items-center justify-between">
           <div>
-            <p className="font-bold text-lg text-blue-600">${product.price.toFixed(2)}</p>
+            <p className="font-bold text-lg text-blue-600">₱{product.price.toFixed(2)}</p>
             <p className="text-xs text-gray-500">Stock: {product.stock}</p>
           </div>
           <Button

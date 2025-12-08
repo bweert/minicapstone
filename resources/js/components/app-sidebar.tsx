@@ -36,7 +36,7 @@ const mainNavItems: NavItem[] = [
     },
     {
         title: 'Point of Sales',
-        href: '#',
+        href: 'pos',
         icon: Weight,
     },
     {
