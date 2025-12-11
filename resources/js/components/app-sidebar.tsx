@@ -13,6 +13,8 @@ import {
 import { dashboard } from '@/routes';
 import { index as categoriesIndex } from '@/routes/categories';
 import { index as productsIndex } from '@/routes/products';
+import {index as transactionsIndex} from '@/routes/transactions';
+import {index as posIndex} from '@/routes/pos';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
 import { SquareUserRound, PhilippinePeso, Cog ,LayoutGrid,ShoppingBasket,Weight,Columns4,Wrench } from 'lucide-react';
@@ -36,12 +38,12 @@ const mainNavItems: NavItem[] = [
     },
     {
         title: 'Point of Sales',
-        href: 'pos',
+        href: posIndex(),
         icon: Weight,
     },
     {
-        title: 'Repair Products',
-        href: '#',
+        title: 'Transactions',
+        href: transactionsIndex(),
         icon: Cog,
     },
     {

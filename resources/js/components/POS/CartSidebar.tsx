@@ -46,7 +46,7 @@ export function CartSidebar({
                 <div>
                   <h4 className="font-semibold text-sm">{item.name}</h4>
                   <p className="text-xs text-gray-600">
-                    ${item.price.toFixed(2)}/unit
+                    ₱{item.price.toFixed(2)}/unit
                   </p>
                 </div>
                 <Button
@@ -86,7 +86,7 @@ export function CartSidebar({
                   </Button>
                 </div>
                 <span className="font-bold">
-                  ${(item.price * item.quantity).toFixed(2)}
+                  ₱{(item.price * item.quantity).toFixed(2)}
                 </span>
               </div>
             </div>
@@ -100,11 +100,11 @@ export function CartSidebar({
           <div className="space-y-2 text-sm">
             <div className="flex justify-between">
               <span className="text-gray-600">Subtotal:</span>
-              <span className="font-semibold">${subtotal.toFixed(2)}</span>
+              <span className="font-semibold">₱{subtotal.toFixed(2)}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-600">Tax:</span>
-              <span className="font-semibold">${tax.toFixed(2)}</span>
+              <span className="font-semibold">₱{tax.toFixed(2)}</span>
             </div>
           </div>
 
@@ -112,7 +112,7 @@ export function CartSidebar({
 
           <div className="flex justify-between text-lg font-bold">
             <span>Total:</span>
-            <span className="text-green-600">${total.toFixed(2)}</span>
+            <span className="text-green-600">₱{total.toFixed(2)}</span>
           </div>
 
           <Button

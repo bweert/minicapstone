@@ -6,6 +6,7 @@ use Laravel\Fortify\Features;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\POSController;
+use App\Http\Controllers\TransactionController;
 
 Route::get('/', function () {
     if (auth()->check()) {
@@ -24,6 +25,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // POS Routes
     Route::get('pos', [POSController::class, 'index'])->name('pos.index');
     Route::post('pos/checkout', [POSController::class, 'checkout'])->name('pos.checkout');
+
+    // Transaction Routes
+    Route::get('transactions', [TransactionController::class, 'index'])->name('transactions.index');
+    Route::get('transactions/{transaction}', [TransactionController::class, 'show'])->name('transactions.show');
 
 });
  

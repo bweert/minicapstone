@@ -85,9 +85,9 @@ export function ReceiptPreview({
                   <tr key={item.id} className="border-b border-gray-200">
                     <td className="py-1">{item.name}</td>
                     <td className="text-right py-1">{item.quantity}</td>
-                    <td className="text-right py-1">${item.price.toFixed(2)}</td>
+                    <td className="text-right py-1">₱{item.price.toFixed(2)}</td>
                     <td className="text-right py-1">
-                      ${(item.price * item.quantity).toFixed(2)}
+                      ₱{(item.price * item.quantity).toFixed(2)}
                     </td>
                   </tr>
                 ))}
@@ -99,23 +99,23 @@ export function ReceiptPreview({
           <div className="border-t-2 border-gray-800 pt-2 space-y-1">
             <div className="flex justify-between">
               <span>Subtotal:</span>
-              <span>${transactionData.subtotal.toFixed(2)}</span>
+              <span>₱{transactionData.subtotal.toFixed(2)}</span>
             </div>
             {transactionData.tax > 0 && (
               <div className="flex justify-between">
                 <span>Tax (12%):</span>
-                <span>${transactionData.tax.toFixed(2)}</span>
+                <span>₱{transactionData.tax.toFixed(2)}</span>
               </div>
             )}
             {transactionData.discount > 0 && (
               <div className="flex justify-between text-green-600">
                 <span>Discount:</span>
-                <span>-${transactionData.discount.toFixed(2)}</span>
+                <span>-₱{transactionData.discount.toFixed(2)}</span>
               </div>
             )}
             <div className="flex justify-between font-bold text-base border-t-2 border-gray-800 pt-1">
               <span>TOTAL:</span>
-              <span>${transactionData.total.toFixed(2)}</span>
+              <span>₱{transactionData.total.toFixed(2)}</span>
             </div>
           </div>
 
@@ -129,11 +129,11 @@ export function ReceiptPreview({
                 </div>
                 <div className="flex justify-between">
                   <span>Amount Received:</span>
-                  <span>${transactionData.amountReceived?.toFixed(2)}</span>
+                  <span>₱{transactionData.amountReceived?.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between font-bold text-base">
                   <span>Change:</span>
-                  <span>${transactionData.change?.toFixed(2)}</span>
+                  <span>₱{transactionData.change?.toFixed(2)}</span>
                 </div>
               </>
             ) : (
@@ -155,9 +155,9 @@ export function ReceiptPreview({
           {/* Footer */}
           <div className="text-center border-t-2 border-gray-800 pt-4 space-y-1">
             <p className="font-bold text-sm">Thank You!</p>
-            <p className="text-xs text-gray-600">We appreciate your business</p>
+            <p className="text-xs text-gray-600">Come again to cellhub</p>
             <p className="text-xs text-gray-600 italic mt-2">
-              Powered by POS System
+              Powered by SANTING AND LEMBERT
             </p>
           </div>
         </div>
@@ -173,10 +173,6 @@ export function ReceiptPreview({
           >
             <Printer className="w-4 h-4" />
             Print Receipt
-          </Button>
-          <Button className="bg-green-600 hover:bg-green-700 flex items-center gap-2">
-            <Download className="w-4 h-4" />
-            Save
           </Button>
         </div>
       </DialogContent>
