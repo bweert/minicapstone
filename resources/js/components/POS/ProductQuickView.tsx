@@ -82,7 +82,7 @@ export function ProductQuickView({
               <div className="bg-blue-50 p-4 rounded-lg mb-4 border border-blue-200">
                 <p className="text-gray-600 text-sm mb-1">Price</p>
                 <p className="text-3xl font-bold text-blue-600">
-                  ${product.price.toFixed(2)}
+                  ₱{product.price.toFixed(2)}
                 </p>
               </div>
 

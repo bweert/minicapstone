@@ -120,24 +120,24 @@ export function CheckoutModal({
           <div className="space-y-2 bg-gray-50 p-4 rounded-lg text-sm border">
             <div className="flex justify-between">
               <span className="text-gray-600">Subtotal:</span>
-              <span>${subtotal.toFixed(2)}</span>
+              <span>₱{subtotal.toFixed(2)}</span>
             </div>
             {tax > 0 && (
               <div className="flex justify-between">
                 <span className="text-gray-600">Tax:</span>
-                <span>${tax.toFixed(2)}</span>
+                <span>₱{tax.toFixed(2)}</span>
               </div>
             )}
             {discount > 0 && (
               <div className="flex justify-between text-green-600">
                 <span>Discount:</span>
-                <span>-${discount.toFixed(2)}</span>
+                <span>-₱{discount.toFixed(2)}</span>
               </div>
             )}
             <Separator />
             <div className="flex justify-between font-bold text-lg">
               <span>Total:</span>
-              <span className="text-blue-600">${total.toFixed(2)}</span>
+              <span className="text-blue-600">₱{total.toFixed(2)}</span>
             </div>
           </div>
 
@@ -167,16 +167,16 @@ export function CheckoutModal({
                 <div className="bg-blue-50 p-3 rounded border border-blue-200 space-y-2">
                   <div className="flex justify-between text-sm">
                     <span>Amount:</span>
-                    <span className="font-semibold">${amountNum.toFixed(2)}</span>
+                    <span className="font-semibold">₱{amountNum.toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between text-sm">
                     <span>Total:</span>
-                    <span className="font-semibold">${total.toFixed(2)}</span>
+                    <span className="font-semibold">₱{total.toFixed(2)}</span>
                   </div>
                   <Separator />
                   <div className="flex justify-between font-bold text-green-600">
                     <span>Change:</span>
-                    <span className="text-lg">${change.toFixed(2)}</span>
+                    <span className="text-lg">₱{change.toFixed(2)}</span>
                   </div>
                 </div>
               )}
@@ -204,7 +204,7 @@ export function CheckoutModal({
               </div>
               <div className="bg-green-50 p-3 rounded border border-green-200">
                 <p className="text-sm text-gray-700">
-                  <strong>Total Amount:</strong> ${total.toFixed(2)}
+                  <strong>Total Amount:</strong> ₱{total.toFixed(2)}
                 </p>
                 <p className="text-xs text-gray-600 mt-2">
                   Please ensure the reference number matches the GCash receipt.
