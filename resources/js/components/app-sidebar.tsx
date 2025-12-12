@@ -16,10 +16,10 @@ import { index as productsIndex } from '@/routes/products';
 import {index as transactionsIndex} from '@/routes/transactions';
 import {index as posIndex} from '@/routes/pos';
 import { type NavItem } from '@/types';
-import { Link, router } from '@inertiajs/react';
+import { Link, router, usePage } from '@inertiajs/react';
 import { SquareUserRound, PhilippinePeso, Cog ,LayoutGrid,ShoppingBasket,Weight,Columns4,Wrench } from 'lucide-react';
 import AppLogo from './app-logo';
-import { useState } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 
 const mainNavItems: NavItem[] = [
     {
@@ -64,6 +64,26 @@ const footerNavItems: NavItem[] = [
 ];  
 
 export function AppSidebar() {
+    const { props } = usePage();
+    const products = (props as any).products || [];
+    
+    // Calculate low stock count from props
+    const lowStockCount = useMemo(() => {
+        return products.filter((product: any) => product.stock_quantity <= 10).length;
+    }, [products]);
+    
+    // Create nav items with dynamic badge
+    const navItems = mainNavItems.map(item => {
+        if (item.title === 'Products' && lowStockCount > 0) {
+            return {
+                ...item,
+                badge: lowStockCount.toString(),
+                badgeVariant: 'destructive' as const,
+            };
+        }
+        return item;
+    });
+    
     return (
         <Sidebar collapsible="icon" variant="inset">
             <SidebarHeader>
@@ -79,7 +99,7 @@ export function AppSidebar() {
             </SidebarHeader>
 
             <SidebarContent>
-                <NavMain items={mainNavItems} />
+                <NavMain items={navItems} />
             </SidebarContent>
 
             <SidebarFooter>

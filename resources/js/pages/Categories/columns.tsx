@@ -35,10 +35,20 @@ export const getColumns = (onEdit: (category: Category) => void): ColumnDef<Cate
     {
         accessorKey: "id",
         header: "ID",
+        cell: ({ row }) => (
+            <span className="px-3 py-1 rounded-full text-sm font-semibold bg-gray-100 text-gray-700">
+                #{row.original.id}
+            </span>
+        ),
     },
     {
         accessorKey: "categorie_name",
         header: "Category Name",
+        cell: ({ row }) => (
+            <span className="px-3 py-1 rounded-full text-sm font-semibold bg-indigo-100 text-indigo-700">
+                {row.original.categorie_name}
+            </span>
+        ),
     },
     {
         id: "actions",
@@ -67,7 +77,7 @@ export const getColumns = (onEdit: (category: Category) => void): ColumnDef<Cate
                 <AlertDialog open={alertOpen} onOpenChange={setAlertOpen}>
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" className="h-8 w-8 p-0">
+                            <Button className="h-8 px-3 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200">
                                 <MoreHorizontal className="h-4 w-4" />
                             </Button>
                         </DropdownMenuTrigger>

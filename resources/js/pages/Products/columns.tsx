@@ -56,29 +56,63 @@ export const getColumns = (onEdit: (product: Product) => void): ColumnDef<Produc
     {
         accessorKey: "name",
         header: "Name",
+        cell: ({ row }) => (
+            <span className="px-3 py-1 rounded-full text-sm font-semibold bg-blue-100 text-blue-700">
+                {row.original.name}
+            </span>
+        ),
     },
     {
         accessorKey: "SKU",
         header: "SKU",
+        cell: ({ row }) => (
+            <span className="px-3 py-1 rounded-full text-sm font-semibold bg-purple-100 text-purple-700">
+                {row.original.SKU}
+            </span>
+        ),
     },
     {
         accessorKey: "price",
         header: "Price",
-        cell: ({ row }) => `₱${parseFloat(row.original.price.toString()).toFixed(2)}`,
+        cell: ({ row }) => (
+            <span className="px-3 py-1 rounded-full text-sm font-semibold bg-indigo-100 text-indigo-700">
+                ₱{parseFloat(row.original.price.toString()).toFixed(2)}
+            </span>
+        ),
     },
     {
         accessorKey: "cost",
         header: "Cost",
-        cell: ({ row }) => `₱${parseFloat(row.original.cost.toString()).toFixed(2)}`,
+        cell: ({ row }) => (
+            <span className="px-3 py-1 rounded-full text-sm font-semibold bg-orange-100 text-orange-700">
+                ₱{parseFloat(row.original.cost.toString()).toFixed(2)}
+            </span>
+        ),
     },
     {
         accessorKey: "stock_quantity",
         header: "Stock",
+        cell: ({ row }) => {
+            const stock = row.original.stock_quantity;
+            const isLow = stock <= 10;
+            
+            return (
+                <span className={`px-3 py-1 rounded-full text-sm font-semibold ${
+                    isLow ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'
+                }`}>
+                    {stock}
+                </span>
+            );
+        },
     },
     {
         accessorKey: "category.categorie_name",
         header: "Category",
-        cell: ({ row }) => row.original.category?.categorie_name || "—",
+        cell: ({ row }) => (
+            <span className="px-3 py-1 rounded-full text-sm font-semibold bg-cyan-100 text-cyan-700">
+                {row.original.category?.categorie_name || "—"}
+            </span>
+        ),
     },
     {
         id: "actions",
@@ -104,9 +138,7 @@ export const getColumns = (onEdit: (product: Product) => void): ColumnDef<Produc
                 setIsDeleting(true);
                 router.delete(`/products/${product.id}`, {
                     onSuccess: () => {
-                        toast.success("Product deleted successfully!");
-                        setAlertOpen(false);
-                        setIsDeleting(false);
+                        toast.success("Product deleted successfully");
                         // Reload page to show updated data
                         setTimeout(() => {
                             window.location.reload();
@@ -123,7 +155,7 @@ export const getColumns = (onEdit: (product: Product) => void): ColumnDef<Produc
                 <AlertDialog open={alertOpen} onOpenChange={setAlertOpen}>
                     <DropdownMenu open={dropdownOpen} onOpenChange={setDropdownOpen}>
                         <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" className="h-8 w-8 p-0">
+                            <Button className="h-8 px-3 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200">
                                 <MoreHorizontal className="h-4 w-4" />
                             </Button>
                         </DropdownMenuTrigger>
