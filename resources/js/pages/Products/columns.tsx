@@ -107,6 +107,10 @@ export const getColumns = (onEdit: (product: Product) => void): ColumnDef<Produc
                         toast.success("Product deleted successfully!");
                         setAlertOpen(false);
                         setIsDeleting(false);
+                        // Reload page to show updated data
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 500);
                     },
                     onError: () => {
                         toast.error("Failed to delete product");

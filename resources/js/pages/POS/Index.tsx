@@ -4,14 +4,17 @@ import { usePage } from '@inertiajs/react';
 import { useCart } from '@/hooks/useCart';
 import { ProductGrid } from '@/components/POS/ProductGrid';
 import { ProductSearch } from '@/components/POS/ProductSearch';
-import { CategoryFilter } from '@/components/POS/CategoryFilter';
 import { ProductQuickView } from '@/components/POS/ProductQuickView';
 import { CartSidebar } from '@/components/POS/CartSidebar';
 import { MobileCartDrawer } from '@/components/POS/MobileCartDrawer';
 import { CheckoutModal, CheckoutData } from '@/components/POS/CheckoutModal';
 import { ReceiptPreview } from '@/components/POS/ReceiptPreview';
 import { toast } from 'sonner';
-
+import {
+  NativeSelect,
+  NativeSelectOptGroup,
+  NativeSelectOption,
+} from "@/components/ui/native-select"
 interface Product {
   id: number;
   name: string;
@@ -221,11 +224,17 @@ export default function POSIndex() {
             <ProductSearch searchQuery={searchQuery} onSearchChange={setSearchQuery} />
 
             {/* Category Filter */}
-            <CategoryFilter
-              categories={categories}
-              selectedCategory={selectedCategory}
-              onCategoryChange={setSelectedCategory}
-            />
+            <div className="space-y-2">
+              <label className="text-sm font-semibold text-gray-700">Filter by Category:</label>
+              <NativeSelect value={selectedCategory || ''} onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setSelectedCategory(e.target.value || null)}>
+                <NativeSelectOption value="">All Categories</NativeSelectOption>
+                {categories.map((category) => (
+                  <NativeSelectOption key={category} value={category}>
+                    {category}
+                  </NativeSelectOption>
+                ))}
+              </NativeSelect>
+            </div>
 
             {/* Products Grid */}
             {filteredProducts.length > 0 ? (

@@ -138,6 +138,10 @@ export function ProductFormModal({ open, onOpenChange, product, categories }: Pr
                     toast.success('Product updated successfully!');
                     setIsProcessing(false);
                     onOpenChange(false);
+                    // Reload page to show updated data
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 500);
                 },
                 onError: (errors: any) => {
                     console.error('Update error:', errors);
@@ -156,6 +160,10 @@ export function ProductFormModal({ open, onOpenChange, product, categories }: Pr
                     toast.success('Product created successfully!');
                     setIsProcessing(false);
                     onOpenChange(false);
+                    // Reload page to show new data
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 500);
                 },
                 onError: (errors: any) => {
                     console.error('Create error:', errors);

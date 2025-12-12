@@ -7,6 +7,11 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\POSController;
 use App\Http\Controllers\TransactionController;
+use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\RepairPartsCategoryController;
+use App\Http\Controllers\RepairPartsController;
+use App\Http\Controllers\ServiceController;
+use App\Http\Controllers\RefundController;
 
 Route::get('/', function () {
     if (auth()->check()) {
@@ -29,6 +34,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Transaction Routes
     Route::get('transactions', [TransactionController::class, 'index'])->name('transactions.index');
     Route::get('transactions/{transaction}', [TransactionController::class, 'show'])->name('transactions.show');
+
+    // Repair System Routes
+    Route::resource('customers', CustomerController::class);
+    Route::resource('repair-parts-categories', RepairPartsCategoryController::class);
+    Route::resource('repair-parts', RepairPartsController::class);
+    Route::resource('services', ServiceController::class);
+    Route::resource('transactions-repair', TransactionController::class);
+    Route::resource('refunds', RefundController::class);
 
 });
  

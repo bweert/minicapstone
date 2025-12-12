@@ -4,6 +4,7 @@ import { Head, usePage } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
+import { NativeSelect, NativeSelectOption } from '@/components/ui/native-select';
 import { DataTable } from '@/components/DataTable';
 import { ProductFormModal, type Product, type Category } from './ProductFormModal';
 import { getColumns } from './columns';
@@ -141,27 +142,15 @@ export default function Index({ products: initialProducts, categories }: Props) 
 
                 {/* Category Filter */}
                 <div className="space-y-2">
-                    <div className="text-sm font-semibold text-gray-700">Filter by Category:</div>
-                    <div className="flex flex-wrap gap-2">
-                        <Badge
-                            variant={selectedCategory === null ? 'default' : 'outline'}
-                            className="cursor-pointer px-3 py-2"
-                            onClick={() => setSelectedCategory(null)}
-                        >
-                            All Categories
-                        </Badge>
-
+                    <label className="text-sm font-semibold text-gray-700">Filter by Category:</label>
+                    <NativeSelect value={selectedCategory?.toString() || ''} onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setSelectedCategory(e.target.value ? parseInt(e.target.value) : null)}>
+                        <NativeSelectOption value="">All Categories</NativeSelectOption>
                         {categories.map((category) => (
-                            <Badge
-                                key={category.id}
-                                variant={selectedCategory === category.id ? 'default' : 'outline'}
-                                className="cursor-pointer px-3 py-2 hover:bg-gray-200 transition"
-                                onClick={() => setSelectedCategory(category.id)}
-                            >
+                            <NativeSelectOption key={category.id} value={category.id.toString()}>
                                 {category.categorie_name}
-                            </Badge>
+                            </NativeSelectOption>
                         ))}
-                    </div>
+                    </NativeSelect>
                 </div>
 
                 {/* Active Filters Display */}

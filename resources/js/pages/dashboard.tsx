@@ -96,10 +96,10 @@ export default function Dashboard() {
                         </div>
                         <div>
                             <h1 className="text-2xl font-bold text-white md:text-3xl">
-                                Hello, {auth.user?.name || 'Admin'}! 👋
+                                Welcome Back, {auth.user?.name || 'Admin'}! 👋
                             </h1>
                             <p className="mt-1 text-sm text-white/90 md:text-base">
-                                Welcome back to your dashboard
+                                Here's a summary of your store's performance.                   
                             </p>
                         </div>
                     </div>
