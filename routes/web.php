@@ -31,6 +31,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('pos', [POSController::class, 'index'])->name('pos.index');
     Route::post('pos/checkout', [POSController::class, 'checkout'])->name('pos.checkout');
 
+    // Repair Routes - Customer Creation
+    Route::get('customers/create', function () {
+        return Inertia::render('Repairs/CreateCustomer');
+    })->name('customers.create');
+
     // Transaction Routes
     Route::get('transactions', [TransactionController::class, 'index'])->name('transactions.index');
     Route::get('transactions/{transaction}', [TransactionController::class, 'show'])->name('transactions.show');

@@ -9,6 +9,8 @@ import { CartSidebar } from '@/components/POS/CartSidebar';
 import { MobileCartDrawer } from '@/components/POS/MobileCartDrawer';
 import { CheckoutModal, CheckoutData } from '@/components/POS/CheckoutModal';
 import { ReceiptPreview } from '@/components/POS/ReceiptPreview';
+import { CustomerFormModal } from '@/components/Repairs/CustomerFormModal';
+import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import {
   NativeSelect,
@@ -41,6 +43,7 @@ export default function POSIndex() {
   const [quickViewOpen, setQuickViewOpen] = useState(false);
   const [checkoutOpen, setCheckoutOpen] = useState(false);
   const [receiptOpen, setReceiptOpen] = useState(false);
+  const [customerModalOpen, setCustomerModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [transactionData, setTransactionData] = useState<any>(null);
   const [searchQuery, setSearchQuery] = useState('');
@@ -78,6 +81,12 @@ export default function POSIndex() {
   const tax = subtotal * 0.0; // 12% tax
   const discount = 0; // Can be dynamic
   const total = subtotal + tax - discount;
+
+  // Handle customer creation success
+  const handleCustomerCreated = (customerId: number) => {
+    // Navigate to services page with customer_id
+    window.location.href = `/services?customer_id=${customerId}`;
+  };
 
   // Handle product quick view
   const handleQuickView = (product: Product) => {
@@ -205,18 +214,26 @@ export default function POSIndex() {
                 <h1 className="text-3xl font-bold text-gray-900">Point of Sale</h1>
                 <p className="text-gray-600 mt-1">Browse and select products</p>
               </div>
-              {/* Mobile Cart Button */}
-              <div className="lg:hidden">
-                <MobileCartDrawer
-                  items={items}
-                  subtotal={subtotal}
-                  tax={tax}
-                  total={total}
-                  onUpdateQuantity={updateQuantity}
-                  onRemoveItem={removeItem}
-                  onCheckout={handleCheckout}
-                  isLoading={isLoading}
-                />
+              <div className="flex gap-3">
+                <Button
+                  onClick={() => setCustomerModalOpen(true)}
+                  className="bg-blue-600 hover:bg-blue-700"
+                >
+                  + New Repair
+                </Button>
+                {/* Mobile Cart Button */}
+                <div className="lg:hidden">
+                  <MobileCartDrawer
+                    items={items}
+                    subtotal={subtotal}
+                    tax={tax}
+                    total={total}
+                    onUpdateQuantity={updateQuantity}
+                    onRemoveItem={removeItem}
+                    onCheckout={handleCheckout}
+                    isLoading={isLoading}
+                  />
+                </div>
               </div>
             </div>
 
@@ -287,6 +304,14 @@ export default function POSIndex() {
         open={receiptOpen}
         onClose={handleCloseReceipt}
         transactionData={transactionData}
+      />
+
+      {/* Customer Form Modal */}
+      <CustomerFormModal
+        open={customerModalOpen}
+        onOpenChange={setCustomerModalOpen}
+        onSuccess={handleCustomerCreated}
+        csrf_token={csrfToken}
       />
     </AppLayout>
   );
