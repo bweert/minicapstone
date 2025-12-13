@@ -23,19 +23,22 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
                                 resolveUrl(item.href),
                             )}
                             tooltip={{ children: item.title }}
+                            className="relative"
                         >
                             <Link href={item.href} prefetch className="flex items-center justify-between">
                                 <span className="flex items-center gap-2">
-                                    {item.icon && <item.icon />}
+                                    {item.icon && 
+                                        <item.icon size={18} strokeWidth={2} className="flex-shrink-0" />
+                                    }
                                     <span>{item.title}</span>
                                 </span>
-                                {(item as any).badge && (
-                                    <span className="ml-auto flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-red-500 text-xs font-bold text-white">
-                                        {(item as any).badge}
-                                    </span>
-                                )}
                             </Link>
                         </SidebarMenuButton>
+                        {(item as any).badge && (
+                            <span className="absolute -top-1 -right-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-red-500 text-xs font-bold text-white">
+                                {(item as any).badge}
+                            </span>
+                        )}
                     </SidebarMenuItem>
                 ))}
             </SidebarMenu>
