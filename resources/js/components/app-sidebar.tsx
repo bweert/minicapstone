@@ -18,6 +18,7 @@ import {index as posIndex} from '@/routes/pos';
 import { type NavItem } from '@/types';
 import { Link, router, usePage } from '@inertiajs/react';
 import { 
+    Newspaper,
     SquareUserRound, 
     PhilippinePeso, 
     Cog,
@@ -60,7 +61,7 @@ const mainNavItems: NavItem[] = [
     {
         title: 'Transactions',
         href: transactionsIndex(),
-        icon: Cog,
+        icon: Newspaper,
     },
 ];
 

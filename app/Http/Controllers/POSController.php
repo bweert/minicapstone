@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Category;
 use App\Models\Product;
 use App\Models\Transaction;
 use App\Models\TransactionItem;
@@ -9,13 +10,16 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Inertia\Inertia;
+use Carbon\Carbon;
 
 class POSController extends Controller
 {
     public function index()
     {
         $products = Product::with('category:id,categorie_name')
-            ->select('id', 'name', 'price', 'stock_quantity', 'image', 'category_id')
+            ->select('id', 'name', 'price', 'stock_quantity', 'image', 'category_id', 'SKU')
+            ->where('stock_quantity', '>', 0)
+            ->orderBy('name')
             ->get()
             ->map(fn($product) => [
                 'id' => $product->id,
@@ -23,14 +27,55 @@ class POSController extends Controller
                 'price' => floatval($product->price),
                 'stock' => $product->stock_quantity,
                 'image' => $product->image ? asset('storage/' . $product->image) : null,
-                'description' => $product->description ?? 'Premium Product',
+                'description' => 'Premium Product',
                 'category' => $product->category?->categorie_name ?? 'Uncategorized',
                 'sku' => $product->SKU ?? null,
             ]);
 
+        // Calculate stats
+        $today = Carbon::today();
+        $totalProducts = Product::where('stock_quantity', '>', 0)->count();
+        $activeCategories = Category::whereHas('products', fn($q) => $q->where('stock_quantity', '>', 0))->count();
+        
+        // Today's sales
+        $todaysSales = Transaction::whereDate('created_at', $today)->sum('total');
+        $todaysTransactions = Transaction::whereDate('created_at', $today)->count();
+        
+        // Average transaction value today
+        $avgTransaction = $todaysTransactions > 0 
+            ? $todaysSales / $todaysTransactions 
+            : 0;
+        
+        // Best seller today
+        $bestSeller = TransactionItem::whereHas('transaction', fn($q) => $q->whereDate('created_at', $today))
+            ->select('product_id', DB::raw('SUM(quantity) as total_qty'))
+            ->groupBy('product_id')
+            ->orderByDesc('total_qty')
+            ->with('product:id,name')
+            ->first();
+
+        // Get all categories for filter
+        $categories = Category::whereHas('products', fn($q) => $q->where('stock_quantity', '>', 0))
+            ->select('id', 'categorie_name')
+            ->orderBy('categorie_name')
+            ->get()
+            ->map(fn($cat) => [
+                'id' => $cat->id,
+                'name' => $cat->categorie_name,
+            ]);
+
         return Inertia::render('POS/Index', [
             'products' => $products,
+            'categories' => $categories,
             'csrf_token' => csrf_token(),
+            'stats' => [
+                'totalProducts' => $totalProducts,
+                'activeCategories' => $activeCategories,
+                'todaysSales' => floatval($todaysSales),
+                'todaysTransactions' => $todaysTransactions,
+                'avgTransaction' => floatval($avgTransaction),
+                'bestSeller' => $bestSeller?->product?->name ?? 'No sales yet',
+            ],
         ]);
     }
 
