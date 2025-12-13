@@ -20,7 +20,6 @@ import { Link, router, usePage } from '@inertiajs/react';
 import { SquareUserRound, PhilippinePeso, Cog ,LayoutGrid,ShoppingBasket,Weight,Columns4,Wrench } from 'lucide-react';
 import AppLogo from './app-logo';
 import { useMemo } from 'react';
-import sales from '@/routes/sales';
 
 const mainNavItems: NavItem[] = [
     {
@@ -55,7 +54,7 @@ const mainNavItems: NavItem[] = [
     },
     {
         title: 'Sales',
-        href: '/sales',
+        href: '#',
         icon: PhilippinePeso,
     },
 ];
