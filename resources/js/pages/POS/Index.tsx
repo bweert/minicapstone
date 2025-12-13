@@ -78,7 +78,7 @@ export default function POSIndex() {
 
   // Calculations
   const subtotal = getSubtotal();
-  const tax = subtotal * 0.0; // 12% tax
+  const tax = subtotal * 0.12; // 12% tax
   const discount = 0; // Can be dynamic
   const total = subtotal + tax - discount;
 

@@ -19,7 +19,8 @@ import { type NavItem } from '@/types';
 import { Link, router, usePage } from '@inertiajs/react';
 import { SquareUserRound, PhilippinePeso, Cog ,LayoutGrid,ShoppingBasket,Weight,Columns4,Wrench } from 'lucide-react';
 import AppLogo from './app-logo';
-import { useState, useMemo, useEffect } from 'react';
+import { useMemo } from 'react';
+import sales from '@/routes/sales';
 
 const mainNavItems: NavItem[] = [
     {
@@ -54,7 +55,7 @@ const mainNavItems: NavItem[] = [
     },
     {
         title: 'Sales',
-        href: '#',
+        href: '/sales',
         icon: PhilippinePeso,
     },
 ];
@@ -65,10 +66,11 @@ const footerNavItems: NavItem[] = [
 
 export function AppSidebar() {
     const { props } = usePage();
-    const products = (props as any).products || [];
+    const products = Array.isArray((props as any).products) ? (props as any).products : [];
     
     // Calculate low stock count from props
     const lowStockCount = useMemo(() => {
+        if (!Array.isArray(products)) return 0;
         return products.filter((product: any) => product.stock_quantity <= 10).length;
     }, [products]);
     

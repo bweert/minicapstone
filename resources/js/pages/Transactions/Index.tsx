@@ -176,7 +176,6 @@ export default function Index({ transactions: initialTransactions }: Props) {
                                         <TableHead className="font-semibold">Payment Method</TableHead>
                                         <TableHead className="font-semibold text-right">Subtotal</TableHead>
                                         <TableHead className="font-semibold text-right">Tax</TableHead>
-                                        <TableHead className="font-semibold text-right">Discount</TableHead>
                                         <TableHead className="font-semibold text-right">Total</TableHead>
                                     </TableRow>
                                 </TableHeader>
@@ -204,9 +203,7 @@ export default function Index({ transactions: initialTransactions }: Props) {
                                             <TableCell className="text-right">
                                                 ₱{(Number(transaction.tax) || 0).toFixed(2)}
                                             </TableCell>
-                                            <TableCell className="text-right text-green-600 font-medium">
-                                                {Number(transaction.discount) > 0 ? `-₱${(Number(transaction.discount) || 0).toFixed(2)}` : '-'}
-                                            </TableCell>
+        
                                             <TableCell className="text-right font-bold text-lg">
                                                 ₱{(Number(transaction.total) || 0).toFixed(2)}
                                             </TableCell>

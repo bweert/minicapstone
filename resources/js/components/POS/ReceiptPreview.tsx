@@ -1,6 +1,6 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
+
 import { CartItem } from '@/hooks/useCart';
 import { Printer, Download } from 'lucide-react';
 import { useRef } from 'react';
@@ -30,6 +30,32 @@ export function ReceiptPreview({
   transactionData,
 }: ReceiptPreviewProps) {
   const printRef = useRef<HTMLDivElement>(null);
+
+  // Handle close and reload
+  const handleCloseAndReload = () => {
+    onClose();
+    window.location.reload();
+  };
+
+  // Handle print and reload
+  const handlePrintAndReload = useReactToPrint({
+    contentRef: printRef,
+    pageStyle: `
+      @page {
+        size: a4;
+        margin: 10mm;
+      }
+      @media print {
+        body {
+          margin: 0;
+          padding: 0;
+        }
+      }
+    `,
+    onAfterPrint: () => {
+      window.location.reload();
+    },
+  });
 
   const handlePrint = useReactToPrint({
     contentRef: printRef,
@@ -63,10 +89,24 @@ export function ReceiptPreview({
         >
           {/* Header */}
           <div className="text-center space-y-2 pb-4 border-b-2 border-gray-800">
+
+            {/* Logo */}
+            <div className="flex justify-center">
+              <img
+                src="/images/public/images/423716193_122100729734197999_6164029439040549086_n.png"
+                alt="Cellub Logo"
+                className="h-12 w-auto"
+              />
+            </div>
+
             <h2 className="text-2xl font-bold">CELLUB</h2>
             <p className="text-xs text-gray-600">Professional Point of Sale</p>
-            <p className="text-xs text-gray-600">Receipt #{transactionData.reference_number}</p>
-            <p className="text-xs text-gray-600">{transactionData.timestamp}</p>
+            <p className="text-xs text-gray-600">
+              Receipt #{transactionData.reference_number}
+            </p>
+            <p className="text-xs text-gray-600">
+              {transactionData.timestamp}
+            </p>
           </div>
 
           {/* Items Table */}
@@ -164,11 +204,11 @@ export function ReceiptPreview({
 
         {/* Actions */}
         <div className="flex gap-2 justify-end pt-4 print:hidden">
-          <Button variant="outline" onClick={onClose}>
+          <Button variant="outline" onClick={handleCloseAndReload}>
             Close
           </Button>
           <Button
-            onClick={handlePrint}
+            onClick={handlePrintAndReload}
             className="bg-blue-600 hover:bg-blue-700 flex items-center gap-2"
           >
             <Printer className="w-4 h-4" />
