@@ -16,6 +16,14 @@ class TransactionController extends Controller
 
         return Inertia::render('Transactions/Index', [
             'transactions' => $transactions,
+            'stats' => [
+                'total_transactions' => Transaction::count(),
+                'total_revenue' => Transaction::sum('total'),
+                'cash_transactions' => Transaction::where('payment_method', 'cash')->count(),
+                'gcash_transactions' => Transaction::where('payment_method', 'gcash')->count(),
+                'today_revenue' => Transaction::whereDate('created_at', today())->sum('total'),
+                'today_transactions' => Transaction::whereDate('created_at', today())->count(),
+            ],
         ]);
     }
 

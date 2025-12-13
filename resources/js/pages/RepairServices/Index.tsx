@@ -1,6 +1,6 @@
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
-import { type Category, type PaginatedData, type CategoryStats } from '@/types/pos';
+import { type RepairService, type PaginatedData } from '@/types/repair';
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import { useState, useEffect, useMemo } from 'react';
 import { toast } from 'sonner';
@@ -19,25 +19,24 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { PageHeader, SearchFilter, Pagination, ConfirmDialog, EmptyState, StatsCard } from '@/components/repair';
-import { Pencil, Trash2, MoreHorizontal, FolderOpen, Package, Tags, FolderX } from 'lucide-react';
+import { PageHeader, SearchFilter, Pagination, ConfirmDialog, EmptyState } from '@/components/repair';
+import { Pencil, Trash2, MoreHorizontal, Settings2 } from 'lucide-react';
 
 const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Categories', href: '/categories' },
+    { title: 'Repair Services', href: '/repair-services' },
 ];
 
 interface Props {
-    categories: PaginatedData<Category>;
-    stats: CategoryStats;
+    services: PaginatedData<RepairService>;
 }
 
-export default function Index({ categories, stats }: Props) {
+export default function Index({ services }: Props) {
     const { props } = usePage();
     const flash = props.flash as { success?: string; error?: string } | undefined;
     
     const [searchQuery, setSearchQuery] = useState('');
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-    const [categoryToDelete, setCategoryToDelete] = useState<Category | null>(null);
+    const [serviceToDelete, setServiceToDelete] = useState<RepairService | null>(null);
     const [isDeleting, setIsDeleting] = useState(false);
 
     useEffect(() => {
@@ -50,121 +49,97 @@ export default function Index({ categories, stats }: Props) {
     }, [flash]);
 
     // Client-side filtering
-    const filteredCategories = useMemo(() => {
-        if (!searchQuery) return categories.data;
+    const filteredServices = useMemo(() => {
+        if (!searchQuery) return services.data;
         const query = searchQuery.toLowerCase();
-        return categories.data.filter(
-            (category) => category.categorie_name.toLowerCase().includes(query)
+        return services.data.filter((service) =>
+            service.name.toLowerCase().includes(query)
         );
-    }, [categories.data, searchQuery]);
+    }, [services.data, searchQuery]);
 
-    const handleDelete = (category: Category) => {
-        setCategoryToDelete(category);
+    const handleDelete = (service: RepairService) => {
+        setServiceToDelete(service);
         setDeleteDialogOpen(true);
     };
 
     const confirmDelete = () => {
-        if (!categoryToDelete) return;
+        if (!serviceToDelete) return;
         
         setIsDeleting(true);
-        router.delete(`/categories/${categoryToDelete.id}`, {
+        router.delete(`/repair-services/${serviceToDelete.id}`, {
             onSuccess: () => {
                 setDeleteDialogOpen(false);
-                setCategoryToDelete(null);
+                setServiceToDelete(null);
                 setIsDeleting(false);
-                toast.success('Category deleted successfully');
+                toast.success('Service deleted successfully');
             },
             onError: () => {
                 setIsDeleting(false);
-                toast.error('Failed to delete category');
+                toast.error('Failed to delete service');
             },
         });
     };
 
     const handlePageChange = (page: number) => {
-        router.get(`/categories?page=${page}`, {}, { preserveState: true });
+        router.get(`/repair-services?page=${page}`, {}, { preserveState: true });
+    };
+
+    const formatCurrency = (amount: number) => {
+        return new Intl.NumberFormat('en-PH', {
+            style: 'currency',
+            currency: 'PHP',
+        }).format(amount);
     };
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Categories" />
+            <Head title="Repair Services" />
 
             <div className="p-6 space-y-6">
                 <PageHeader
-                    title="Categories"
-                    description="Organize your products into categories"
-                    createRoute="/categories/create"
-                    createLabel="Add Category"
+                    title="Repair Services"
+                    description="Manage the services you offer for repairs"
+                    createRoute="/repair-services/create"
+                    createLabel="Add Service"
                 />
-
-                {/* Stats Cards */}
-                <div className="grid gap-4 md:grid-cols-3">
-                    <StatsCard
-                        title="Total Categories"
-                        value={stats.total}
-                        icon={Tags}
-                        iconColor="text-blue-600"
-                        iconBgColor="bg-blue-100"
-                    />
-                    <StatsCard
-                        title="With Products"
-                        value={stats.with_products}
-                        icon={Package}
-                        iconColor="text-green-600"
-                        iconBgColor="bg-green-100"
-                    />
-                    <StatsCard
-                        title="Empty Categories"
-                        value={stats.empty}
-                        icon={FolderX}
-                        iconColor="text-orange-600"
-                        iconBgColor="bg-orange-100"
-                    />
-                </div>
 
                 <SearchFilter
                     searchValue={searchQuery}
                     onSearchChange={setSearchQuery}
-                    searchPlaceholder="Search categories by name..."
+                    searchPlaceholder="Search services..."
                 />
 
-                {filteredCategories.length > 0 ? (
+                {filteredServices.length > 0 ? (
                     <>
-                        <div className="rounded-lg border bg-card shadow-sm">
+                        <div className="rounded-lg border bg-card shadow-sm overflow-hidden">
                             <Table>
                                 <TableHeader>
                                     <TableRow className="bg-muted/50">
-                                        <TableHead className="font-semibold">Category Name</TableHead>
-                                        <TableHead className="font-semibold text-center">Products</TableHead>
+                                        <TableHead className="font-semibold">Service Name</TableHead>
+                                        <TableHead className="font-semibold">Base Price</TableHead>
                                         <TableHead className="font-semibold">Created</TableHead>
                                         <TableHead className="w-[70px]"></TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
-                                    {filteredCategories.map((category) => (
+                                    {filteredServices.map((service) => (
                                         <TableRow
-                                            key={category.id}
-                                            className="cursor-pointer hover:bg-muted/50 transition-colors"
+                                            key={service.id}
+                                            className="hover:bg-muted/50 transition-colors"
                                         >
-                                            <TableCell className="font-medium">
+                                            <TableCell>
                                                 <div className="flex items-center gap-3">
                                                     <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                                                        <FolderOpen className="h-5 w-5 text-primary" />
+                                                        <Settings2 className="h-5 w-5 text-primary" />
                                                     </div>
-                                                    <span className="text-base">{category.categorie_name}</span>
+                                                    <span className="font-medium">{service.name}</span>
                                                 </div>
                                             </TableCell>
-                                            <TableCell className="text-center">
-                                                <span className={`inline-flex items-center justify-center px-3 py-1 rounded-full text-sm font-medium ${
-                                                    (category.products_count ?? 0) > 0 
-                                                        ? 'bg-green-100 text-green-700' 
-                                                        : 'bg-gray-100 text-gray-500'
-                                                }`}>
-                                                    {category.products_count ?? 0} products
-                                                </span>
+                                            <TableCell className="font-semibold text-primary">
+                                                {formatCurrency(service.base_price)}
                                             </TableCell>
                                             <TableCell className="text-muted-foreground">
-                                                {new Date(category.created_at).toLocaleDateString()}
+                                                {new Date(service.created_at).toLocaleDateString()}
                                             </TableCell>
                                             <TableCell>
                                                 <DropdownMenu>
@@ -175,13 +150,13 @@ export default function Index({ categories, stats }: Props) {
                                                     </DropdownMenuTrigger>
                                                     <DropdownMenuContent align="end">
                                                         <DropdownMenuItem asChild>
-                                                            <Link href={`/categories/${category.id}/edit`}>
+                                                            <Link href={`/repair-services/${service.id}/edit`}>
                                                                 <Pencil className="mr-2 h-4 w-4" />
                                                                 Edit
                                                             </Link>
                                                         </DropdownMenuItem>
                                                         <DropdownMenuItem
-                                                            onClick={() => handleDelete(category)}
+                                                            onClick={() => handleDelete(service)}
                                                             className="text-red-600 focus:text-red-600"
                                                         >
                                                             <Trash2 className="mr-2 h-4 w-4" />
@@ -197,20 +172,20 @@ export default function Index({ categories, stats }: Props) {
                         </div>
 
                         <Pagination
-                            currentPage={categories.current_page}
-                            totalPages={categories.last_page}
-                            totalItems={categories.total}
-                            itemsPerPage={categories.per_page}
+                            currentPage={services.current_page}
+                            totalPages={services.last_page}
+                            totalItems={services.total}
+                            itemsPerPage={services.per_page}
                             onPageChange={handlePageChange}
                         />
                     </>
                 ) : (
                     <EmptyState
-                        icon={Tags}
-                        title="No categories found"
-                        description="Get started by creating your first category to organize products."
-                        createRoute="/categories/create"
-                        createLabel="Add Category"
+                        icon={Settings2}
+                        title="No services found"
+                        description="Add repair services that you offer to customers."
+                        createRoute="/repair-services/create"
+                        createLabel="Add Service"
                     />
                 )}
             </div>
@@ -218,8 +193,8 @@ export default function Index({ categories, stats }: Props) {
             <ConfirmDialog
                 open={deleteDialogOpen}
                 onOpenChange={setDeleteDialogOpen}
-                title="Delete Category"
-                description={`Are you sure you want to delete "${categoryToDelete?.categorie_name}"? This action cannot be undone.`}
+                title="Delete Service"
+                description={`Are you sure you want to delete "${serviceToDelete?.name}"? This action cannot be undone.`}
                 confirmLabel="Delete"
                 onConfirm={confirmDelete}
                 variant="destructive"

@@ -17,7 +17,22 @@ import {index as transactionsIndex} from '@/routes/transactions';
 import {index as posIndex} from '@/routes/pos';
 import { type NavItem } from '@/types';
 import { Link, router, usePage } from '@inertiajs/react';
-import { SquareUserRound, PhilippinePeso, Cog ,LayoutGrid,ShoppingBasket,Weight,Columns4,Wrench } from 'lucide-react';
+import { 
+    SquareUserRound, 
+    PhilippinePeso, 
+    Cog,
+    LayoutGrid,
+    ShoppingBasket,
+    Weight,
+    Columns4,
+    Wrench,
+    Users,
+    ClipboardList,
+    Settings2,
+    Package,
+    CreditCard,
+    BarChart3,
+} from 'lucide-react';
 import AppLogo from './app-logo';
 import { useMemo } from 'react';
 
@@ -47,15 +62,34 @@ const mainNavItems: NavItem[] = [
         href: transactionsIndex(),
         icon: Cog,
     },
+];
+
+// Repair Management Navigation Items
+const repairNavItems: NavItem[] = [
     {
-        title: 'Repairs',
-        href: '#',
-        icon: Wrench,
+        title: 'Customers',
+        href: '/customers',
+        icon: Users,
     },
     {
-        title: 'Sales',
-        href: '#',
-        icon: PhilippinePeso,
+        title: 'Repair Orders',
+        href: '/repair-orders',
+        icon: ClipboardList,
+    },
+    {
+        title: 'Services',
+        href: '/repair-services',
+        icon: Settings2,
+    },
+    {
+        title: 'Spare Parts',
+        href: '/spare-parts',
+        icon: Package,
+    },
+    {
+        title: 'Payments',
+        href: '/payments',
+        icon: CreditCard,
     },
 ];
 
@@ -101,6 +135,7 @@ export function AppSidebar() {
 
             <SidebarContent>
                 <NavMain items={navItems} />
+                <NavMain items={repairNavItems} label="Repair Management" />
             </SidebarContent>
 
             <SidebarFooter>

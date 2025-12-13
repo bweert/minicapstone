@@ -11,16 +11,25 @@ class ProductController extends Controller
 {
     public function index()
     {
+        $products = Product::with('category')
+            ->orderBy('created_at', 'desc')
+            ->paginate(15);
+
         return Inertia::render('Products/Index', [
-            'products' => Product::with('category')->get(),
+            'products' => $products,
             'categories' => Category::all(),
+            'stats' => [
+                'total' => Product::count(),
+                'total_value' => Product::sum(\DB::raw('price * stock_quantity')),
+                'low_stock' => Product::where('stock_quantity', '<=', 10)->count(),
+                'out_of_stock' => Product::where('stock_quantity', '=', 0)->count(),
+            ],
         ]);
     }
 
-    // ✅ ADD THIS - Shows the create form page (optional with modals)
     public function create()
     {
-        return Inertia::render('Products/Index', [
+        return Inertia::render('Products/Create', [
             'categories' => Category::all(),
         ]);
     }
@@ -46,11 +55,10 @@ class ProductController extends Controller
         return redirect()->route('products.index')->with('success', 'Product created successfully!');
     }
 
-    // ✅ ADD THIS - Shows the edit form page (optional with modals)
     public function edit(Product $product)
     {
-        return Inertia::render('Products/Index', [
-            'product' => $product,
+        return Inertia::render('Products/Edit', [
+            'product' => $product->load('category'),
             'categories' => Category::all(),
         ]);
     }
@@ -79,10 +87,11 @@ class ProductController extends Controller
         return redirect()->route('products.index')->with('success', 'Product updated successfully!');
     }
 
-    // ✅ ADD THIS - Optional show method for viewing single product
     public function show(Product $product)
     {
-        return response()->json($product->load('category'));
+        return Inertia::render('Products/Show', [
+            'product' => $product->load('category'),
+        ]);
     }
 
     public function destroy(Product $product)

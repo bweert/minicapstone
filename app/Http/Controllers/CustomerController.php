@@ -4,65 +4,61 @@ namespace App\Http\Controllers;
 
 use App\Models\Customer;
 use Illuminate\Http\Request;
-use Illuminate\Http\JsonResponse;
+use Inertia\Inertia;
 
 class CustomerController extends Controller
 {
-    public function index(Request $request): JsonResponse
+    public function index()
     {
-        $query = Customer::query();
-
-        if ($request->filled('search')) {
-            $search = $request->search;
-            $query->where('name', 'like', "%{$search}%")
-                  ->orWhere('address', 'like', "%{$search}%")
-                  ->orWhere('brand', 'like', "%{$search}%");
-        }
-
-        $customers = $query->paginate(15);
-
-        return response()->json($customers);
+        $customers = Customer::latest()->paginate(10);
+        return Inertia::render('Customers/Index', ['customers' => $customers]);
     }
 
-    public function store(Request $request): JsonResponse
+    public function create()
+    {
+        return Inertia::render('Customers/Create');
+    }
+
+    public function store(Request $request)
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'address' => 'nullable|string',
-            'brand' => 'required|string|max:255',
-            'unit' => 'required|string|max:255',
-            'problem' => 'required|string',
+            'phone' => 'nullable|string|max:20',
+            'email' => 'nullable|email|max:255',
         ]);
 
-        $customer = Customer::create($validated);
+        Customer::create($validated);
 
-        return response()->json(['data' => $customer], 201);
+        return redirect()->route('customers.index')->with('success', 'Customer created successfully.');
     }
 
-    public function show(Customer $customer): JsonResponse
+    public function show(Customer $customer)
     {
-        return response()->json(['data' => $customer]);
+        $customer->load('repairOrders.services.service', 'repairOrders.payments');
+        return Inertia::render('Customers/Show', ['customer' => $customer]);
     }
 
-    public function update(Request $request, Customer $customer): JsonResponse
+    public function edit(Customer $customer)
+    {
+        return Inertia::render('Customers/Edit', ['customer' => $customer]);
+    }
+
+    public function update(Request $request, Customer $customer)
     {
         $validated = $request->validate([
-            'name' => 'sometimes|string|max:255',
-            'address' => 'nullable|string',
-            'brand' => 'sometimes|string|max:255',
-            'unit' => 'sometimes|string|max:255',
-            'problem' => 'sometimes|string',
+            'name' => 'required|string|max:255',
+            'phone' => 'nullable|string|max:20',
+            'email' => 'nullable|email|max:255',
         ]);
 
         $customer->update($validated);
 
-        return response()->json(['data' => $customer->fresh()]);
+        return redirect()->route('customers.index')->with('success', 'Customer updated successfully.');
     }
 
-    public function destroy(Customer $customer): JsonResponse
+    public function destroy(Customer $customer)
     {
         $customer->delete();
-
-        return response()->json(['message' => 'Customer deleted']);
+        return redirect()->route('customers.index')->with('success', 'Customer deleted successfully.');
     }
 }

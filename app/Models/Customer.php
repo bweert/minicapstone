@@ -3,19 +3,18 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Customer extends Model
 {
     protected $fillable = [
         'name',
-        'address',
-        'brand',
-        'unit',
-        'problem',
+        'phone',
+        'email',
     ];
 
-    public function transactions()
+    public function repairOrders(): HasMany
     {
-        return $this->hasMany(Transaction::class);
+        return $this->hasMany(RepairOrder::class);
     }
 }

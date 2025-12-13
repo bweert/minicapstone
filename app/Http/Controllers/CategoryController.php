@@ -11,14 +11,23 @@ class CategoryController extends Controller
 {
     public function index()
     {
+        $categories = Category::withCount('products')
+            ->orderBy('created_at', 'desc')
+            ->paginate(15);
+
         return Inertia::render('Categories/Index', [
-            'categories' => Category::all(), // Get all categories
+            'categories' => $categories,
+            'stats' => [
+                'total' => Category::count(),
+                'with_products' => Category::has('products')->count(),
+                'empty' => Category::doesntHave('products')->count(),
+            ],
         ]);
     }
 
     public function create()
     {
-        return Inertia::render('Categories/Form');
+        return Inertia::render('Categories/Create');
     }
 
     public function store(Request $request)
@@ -34,7 +43,7 @@ class CategoryController extends Controller
 
     public function edit(Category $category)
     {
-        return Inertia::render('Categories/Form', [
+        return Inertia::render('Categories/Edit', [
             'category' => $category,
         ]);
     }

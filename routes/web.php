@@ -12,6 +12,10 @@ use App\Http\Controllers\RepairPartsCategoryController;
 use App\Http\Controllers\RepairPartsController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\RefundController;
+use App\Http\Controllers\SparePartController;
+use App\Http\Controllers\RepairServiceController;
+use App\Http\Controllers\RepairOrderController;
+use App\Http\Controllers\PaymentController;
 
 Route::get('/', function () {
     if (auth()->check()) {
@@ -47,6 +51,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('services', ServiceController::class);
     Route::resource('transactions-repair', TransactionController::class);
     Route::resource('refunds', RefundController::class);
+
+    // New Repair Management Routes
+    Route::resource('spare-parts', SparePartController::class);
+    Route::resource('repair-services', RepairServiceController::class);
+    Route::resource('repair-orders', RepairOrderController::class);
+    Route::post('repair-orders/{repairOrder}/add-service', [RepairOrderController::class, 'addService'])->name('repair-orders.add-service');
+    Route::post('repair-orders/{repairOrder}/services/{serviceId}/add-part', [RepairOrderController::class, 'addPart'])->name('repair-orders.add-part');
+    Route::resource('payments', PaymentController::class);
 
 });
  

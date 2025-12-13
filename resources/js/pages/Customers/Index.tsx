@@ -1,6 +1,6 @@
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
-import { type Category, type PaginatedData, type CategoryStats } from '@/types/pos';
+import { type Customer, type PaginatedData } from '@/types/repair';
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import { useState, useEffect, useMemo } from 'react';
 import { toast } from 'sonner';
@@ -19,25 +19,24 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { PageHeader, SearchFilter, Pagination, ConfirmDialog, EmptyState, StatsCard } from '@/components/repair';
-import { Pencil, Trash2, MoreHorizontal, FolderOpen, Package, Tags, FolderX } from 'lucide-react';
+import { PageHeader, SearchFilter, Pagination, ConfirmDialog, EmptyState } from '@/components/repair';
+import { Eye, Pencil, Trash2, MoreHorizontal, Users, Phone, Mail } from 'lucide-react';
 
 const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Categories', href: '/categories' },
+    { title: 'Customers', href: '/customers' },
 ];
 
 interface Props {
-    categories: PaginatedData<Category>;
-    stats: CategoryStats;
+    customers: PaginatedData<Customer>;
 }
 
-export default function Index({ categories, stats }: Props) {
+export default function Index({ customers }: Props) {
     const { props } = usePage();
     const flash = props.flash as { success?: string; error?: string } | undefined;
     
     const [searchQuery, setSearchQuery] = useState('');
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-    const [categoryToDelete, setCategoryToDelete] = useState<Category | null>(null);
+    const [customerToDelete, setCustomerToDelete] = useState<Customer | null>(null);
     const [isDeleting, setIsDeleting] = useState(false);
 
     useEffect(() => {
@@ -50,121 +49,113 @@ export default function Index({ categories, stats }: Props) {
     }, [flash]);
 
     // Client-side filtering
-    const filteredCategories = useMemo(() => {
-        if (!searchQuery) return categories.data;
+    const filteredCustomers = useMemo(() => {
+        if (!searchQuery) return customers.data;
         const query = searchQuery.toLowerCase();
-        return categories.data.filter(
-            (category) => category.categorie_name.toLowerCase().includes(query)
+        return customers.data.filter(
+            (customer) =>
+                customer.name.toLowerCase().includes(query) ||
+                customer.email?.toLowerCase().includes(query) ||
+                customer.phone?.toLowerCase().includes(query)
         );
-    }, [categories.data, searchQuery]);
+    }, [customers.data, searchQuery]);
 
-    const handleDelete = (category: Category) => {
-        setCategoryToDelete(category);
+    const handleDelete = (customer: Customer) => {
+        setCustomerToDelete(customer);
         setDeleteDialogOpen(true);
     };
 
     const confirmDelete = () => {
-        if (!categoryToDelete) return;
+        if (!customerToDelete) return;
         
         setIsDeleting(true);
-        router.delete(`/categories/${categoryToDelete.id}`, {
+        router.delete(`/customers/${customerToDelete.id}`, {
             onSuccess: () => {
                 setDeleteDialogOpen(false);
-                setCategoryToDelete(null);
+                setCustomerToDelete(null);
                 setIsDeleting(false);
-                toast.success('Category deleted successfully');
+                toast.success('Customer deleted successfully');
             },
             onError: () => {
                 setIsDeleting(false);
-                toast.error('Failed to delete category');
+                toast.error('Failed to delete customer');
             },
         });
     };
 
     const handlePageChange = (page: number) => {
-        router.get(`/categories?page=${page}`, {}, { preserveState: true });
+        router.get(`/customers?page=${page}`, {}, { preserveState: true });
     };
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Categories" />
+            <Head title="Customers" />
 
             <div className="p-6 space-y-6">
                 <PageHeader
-                    title="Categories"
-                    description="Organize your products into categories"
-                    createRoute="/categories/create"
-                    createLabel="Add Category"
+                    title="Customers"
+                    description="Manage your customer database"
+                    createRoute="/customers/create"
+                    createLabel="Add Customer"
                 />
-
-                {/* Stats Cards */}
-                <div className="grid gap-4 md:grid-cols-3">
-                    <StatsCard
-                        title="Total Categories"
-                        value={stats.total}
-                        icon={Tags}
-                        iconColor="text-blue-600"
-                        iconBgColor="bg-blue-100"
-                    />
-                    <StatsCard
-                        title="With Products"
-                        value={stats.with_products}
-                        icon={Package}
-                        iconColor="text-green-600"
-                        iconBgColor="bg-green-100"
-                    />
-                    <StatsCard
-                        title="Empty Categories"
-                        value={stats.empty}
-                        icon={FolderX}
-                        iconColor="text-orange-600"
-                        iconBgColor="bg-orange-100"
-                    />
-                </div>
 
                 <SearchFilter
                     searchValue={searchQuery}
                     onSearchChange={setSearchQuery}
-                    searchPlaceholder="Search categories by name..."
+                    searchPlaceholder="Search customers by name, email, or phone..."
                 />
 
-                {filteredCategories.length > 0 ? (
+                {filteredCustomers.length > 0 ? (
                     <>
                         <div className="rounded-lg border bg-card shadow-sm">
                             <Table>
                                 <TableHeader>
                                     <TableRow className="bg-muted/50">
-                                        <TableHead className="font-semibold">Category Name</TableHead>
-                                        <TableHead className="font-semibold text-center">Products</TableHead>
+                                        <TableHead className="font-semibold">Name</TableHead>
+                                        <TableHead className="font-semibold">Phone</TableHead>
+                                        <TableHead className="font-semibold">Email</TableHead>
                                         <TableHead className="font-semibold">Created</TableHead>
                                         <TableHead className="w-[70px]"></TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
-                                    {filteredCategories.map((category) => (
+                                    {filteredCustomers.map((customer) => (
                                         <TableRow
-                                            key={category.id}
+                                            key={customer.id}
                                             className="cursor-pointer hover:bg-muted/50 transition-colors"
                                         >
                                             <TableCell className="font-medium">
-                                                <div className="flex items-center gap-3">
-                                                    <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                                                        <FolderOpen className="h-5 w-5 text-primary" />
+                                                <div className="flex items-center gap-2">
+                                                    <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
+                                                        <span className="text-sm font-semibold text-primary">
+                                                            {customer.name.charAt(0).toUpperCase()}
+                                                        </span>
                                                     </div>
-                                                    <span className="text-base">{category.categorie_name}</span>
+                                                    {customer.name}
                                                 </div>
                                             </TableCell>
-                                            <TableCell className="text-center">
-                                                <span className={`inline-flex items-center justify-center px-3 py-1 rounded-full text-sm font-medium ${
-                                                    (category.products_count ?? 0) > 0 
-                                                        ? 'bg-green-100 text-green-700' 
-                                                        : 'bg-gray-100 text-gray-500'
-                                                }`}>
-                                                    {category.products_count ?? 0} products
-                                                </span>
+                                            <TableCell>
+                                                {customer.phone ? (
+                                                    <div className="flex items-center gap-2 text-muted-foreground">
+                                                        <Phone className="h-4 w-4" />
+                                                        {customer.phone}
+                                                    </div>
+                                                ) : (
+                                                    <span className="text-muted-foreground">—</span>
+                                                )}
+                                            </TableCell>
+                                            <TableCell>
+                                                {customer.email ? (
+                                                    <div className="flex items-center gap-2 text-muted-foreground">
+                                                        <Mail className="h-4 w-4" />
+                                                        {customer.email}
+                                                    </div>
+                                                ) : (
+                                                    <span className="text-muted-foreground">—</span>
+                                                )}
                                             </TableCell>
                                             <TableCell className="text-muted-foreground">
-                                                {new Date(category.created_at).toLocaleDateString()}
+                                                {new Date(customer.created_at).toLocaleDateString()}
                                             </TableCell>
                                             <TableCell>
                                                 <DropdownMenu>
@@ -175,13 +166,19 @@ export default function Index({ categories, stats }: Props) {
                                                     </DropdownMenuTrigger>
                                                     <DropdownMenuContent align="end">
                                                         <DropdownMenuItem asChild>
-                                                            <Link href={`/categories/${category.id}/edit`}>
+                                                            <Link href={`/customers/${customer.id}`}>
+                                                                <Eye className="mr-2 h-4 w-4" />
+                                                                View
+                                                            </Link>
+                                                        </DropdownMenuItem>
+                                                        <DropdownMenuItem asChild>
+                                                            <Link href={`/customers/${customer.id}/edit`}>
                                                                 <Pencil className="mr-2 h-4 w-4" />
                                                                 Edit
                                                             </Link>
                                                         </DropdownMenuItem>
                                                         <DropdownMenuItem
-                                                            onClick={() => handleDelete(category)}
+                                                            onClick={() => handleDelete(customer)}
                                                             className="text-red-600 focus:text-red-600"
                                                         >
                                                             <Trash2 className="mr-2 h-4 w-4" />
@@ -197,20 +194,20 @@ export default function Index({ categories, stats }: Props) {
                         </div>
 
                         <Pagination
-                            currentPage={categories.current_page}
-                            totalPages={categories.last_page}
-                            totalItems={categories.total}
-                            itemsPerPage={categories.per_page}
+                            currentPage={customers.current_page}
+                            totalPages={customers.last_page}
+                            totalItems={customers.total}
+                            itemsPerPage={customers.per_page}
                             onPageChange={handlePageChange}
                         />
                     </>
                 ) : (
                     <EmptyState
-                        icon={Tags}
-                        title="No categories found"
-                        description="Get started by creating your first category to organize products."
-                        createRoute="/categories/create"
-                        createLabel="Add Category"
+                        icon={Users}
+                        title="No customers found"
+                        description="Get started by adding your first customer to the system."
+                        createRoute="/customers/create"
+                        createLabel="Add Customer"
                     />
                 )}
             </div>
@@ -218,8 +215,8 @@ export default function Index({ categories, stats }: Props) {
             <ConfirmDialog
                 open={deleteDialogOpen}
                 onOpenChange={setDeleteDialogOpen}
-                title="Delete Category"
-                description={`Are you sure you want to delete "${categoryToDelete?.categorie_name}"? This action cannot be undone.`}
+                title="Delete Customer"
+                description={`Are you sure you want to delete "${customerToDelete?.name}"? This action cannot be undone.`}
                 confirmLabel="Delete"
                 onConfirm={confirmDelete}
                 variant="destructive"
