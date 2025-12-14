@@ -8,10 +8,6 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\POSController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\CustomerController;
-use App\Http\Controllers\RepairPartsCategoryController;
-use App\Http\Controllers\RepairPartsController;
-use App\Http\Controllers\ServiceController;
-use App\Http\Controllers\RefundController;
 use App\Http\Controllers\SparePartController;
 use App\Http\Controllers\RepairServiceController;
 use App\Http\Controllers\RepairOrderController;
@@ -42,22 +38,19 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Transaction Routes
     Route::get('transactions', [TransactionController::class, 'index'])->name('transactions.index');
     Route::get('transactions/{transaction}', [TransactionController::class, 'show'])->name('transactions.show');
+    Route::post('transactions/{transaction}/refund', [TransactionController::class, 'refund'])->name('transactions.refund');
 
     // Repair System Routes
     Route::resource('customers', CustomerController::class);
-    Route::resource('repair-parts-categories', RepairPartsCategoryController::class);
-    Route::resource('repair-parts', RepairPartsController::class);
-    Route::resource('services', ServiceController::class);
-    Route::resource('transactions-repair', TransactionController::class);
-    Route::resource('refunds', RefundController::class);
 
-    // New Repair Management Routes
+    // Repair Management Routes
     Route::resource('spare-parts', SparePartController::class);
     Route::resource('repair-services', RepairServiceController::class);
     Route::resource('repair-orders', RepairOrderController::class);
     Route::post('repair-orders/{repairOrder}/add-service', [RepairOrderController::class, 'addService'])->name('repair-orders.add-service');
     Route::post('repair-orders/{repairOrder}/services/{serviceId}/add-part', [RepairOrderController::class, 'addPart'])->name('repair-orders.add-part');
     Route::resource('payments', PaymentController::class);
+    Route::post('payments/{payment}/refund', [PaymentController::class, 'refund'])->name('payments.refund');
 
 });
  

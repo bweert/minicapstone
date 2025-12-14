@@ -3,7 +3,7 @@ import { Link, router } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
-import AppLayout from '@/layouts/AppLayout';
+import AppLayout from '@/layouts/app-layout';
 
 export default function CreateCustomer() {
   const [formData, setFormData] = useState({

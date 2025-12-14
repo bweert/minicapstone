@@ -9,6 +9,8 @@ use App\Models\Customer;
 use App\Models\SparePart;
 use App\Models\RepairOrder;
 use App\Models\RepairService;
+use App\Models\Payment;
+use App\Models\RefundedItem;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Carbon\Carbon;
@@ -104,6 +106,36 @@ class DashboardController extends Controller
         $cashSales = Transaction::where('payment_method', 'cash')->sum('total');
         $gcashSales = Transaction::where('payment_method', 'gcash')->sum('total');
 
+        // Refund Stats - POS Transactions
+        $posRefundedAmount = 0;
+        $posRefundedCount = 0;
+        $posPartialRefunds = 0;
+        $posFullRefunds = 0;
+        
+        try {
+            if (class_exists(\App\Models\RefundedItem::class)) {
+                $posRefundedAmount = RefundedItem::sum('refund_amount');
+                $posRefundedCount = RefundedItem::distinct('transaction_id')->count('transaction_id');
+                $posPartialRefunds = Transaction::where('status', 'partially_refunded')->count();
+                $posFullRefunds = Transaction::where('status', 'refunded')->count();
+            }
+        } catch (\Exception $e) {
+            // RefundedItem table doesn't exist
+        }
+
+        // Refund Stats - Repair Orders
+        $repairRefundedAmount = 0;
+        $repairRefundedCount = 0;
+        
+        try {
+            if (class_exists(\App\Models\Payment::class)) {
+                $repairRefundedAmount = Payment::where('status', 'refunded')->sum('refund_amount');
+                $repairRefundedCount = Payment::where('status', 'refunded')->count();
+            }
+        } catch (\Exception $e) {
+            // Payment refund columns don't exist
+        }
+
         // Daily sales for chart (last 7 days)
         $dailySales = [];
         for ($i = 6; $i >= 0; $i--) {
@@ -139,6 +171,12 @@ class DashboardController extends Controller
                 'completedRepairs' => $completedRepairs,
                 'cashSales' => $cashSales,
                 'gcashSales' => $gcashSales,
+                'posRefundedAmount' => $posRefundedAmount,
+                'posRefundedCount' => $posRefundedCount,
+                'posPartialRefunds' => $posPartialRefunds,
+                'posFullRefunds' => $posFullRefunds,
+                'repairRefundedAmount' => $repairRefundedAmount,
+                'repairRefundedCount' => $repairRefundedCount,
             ],
             'recentTransactions' => $recentTransactions,
             'lowStockItems' => $lowStockItems,

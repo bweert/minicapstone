@@ -91,4 +91,27 @@ class PaymentController extends Controller
         $payment->delete();
         return redirect()->route('payments.index')->with('success', 'Payment deleted successfully.');
     }
+
+    /**
+     * Process refund for a payment
+     */
+    public function refund(Request $request, Payment $payment)
+    {
+        $request->validate([
+            'amount' => 'required|numeric|min:0.01|max:' . $payment->amount,
+            'reason' => 'nullable|string|max:255',
+        ]);
+
+        if (!$payment->canBeRefunded()) {
+            return back()->withErrors(['error' => 'This payment has already been refunded.']);
+        }
+
+        $payment->processRefund(
+            (float) $request->amount,
+            $request->reason ?? 'No reason provided',
+            auth()->id()
+        );
+
+        return back()->with('success', 'Payment refunded successfully. Amount: ₱' . number_format($request->amount, 2));
+    }
 }

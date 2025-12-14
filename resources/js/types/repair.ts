@@ -66,7 +66,15 @@ export interface Payment {
     repair_order_id: number;
     amount: number;
     payment_method: 'cash' | 'card' | 'online';
-    status: 'pending' | 'paid';
+    status: 'pending' | 'paid' | 'refunded';
+    refund_amount?: number;
+    refund_reason?: string;
+    refunded_by?: number;
+    refunded_at?: string;
+    refunded_by_user?: {
+        id: number;
+        name: string;
+    };
     created_at: string;
     updated_at: string;
     repair_order?: RepairOrder;

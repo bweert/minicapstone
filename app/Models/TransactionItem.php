@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class TransactionItem extends Model
 {
@@ -28,5 +29,34 @@ class TransactionItem extends Model
     public function product(): BelongsTo
     {
         return $this->belongsTo(Product::class);
+    }
+
+    public function refundedItems(): HasMany
+    {
+        return $this->hasMany(RefundedItem::class);
+    }
+
+    /**
+     * Get total quantity refunded for this item
+     */
+    public function getRefundedQuantity(): int
+    {
+        return $this->refundedItems()->sum('quantity_refunded');
+    }
+
+    /**
+     * Get available quantity that can still be refunded
+     */
+    public function getRefundableQuantity(): int
+    {
+        return $this->quantity - $this->getRefundedQuantity();
+    }
+
+    /**
+     * Check if item can be refunded
+     */
+    public function canBeRefunded(): bool
+    {
+        return $this->getRefundableQuantity() > 0;
     }
 }

@@ -80,7 +80,7 @@ class RepairOrderController extends Controller
             'customer',
             'services.service',
             'services.parts.part',
-            'payments'
+            'payments.refundedByUser'
         ]);
 
         return Inertia::render('RepairOrders/Show', ['order' => $repairOrder]);

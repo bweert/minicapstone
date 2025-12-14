@@ -22,6 +22,25 @@ export interface Product {
     updated_at: string;
 }
 
+export interface RefundedItem {
+    id: number;
+    transaction_id: number;
+    transaction_item_id: number;
+    product_id: number;
+    quantity_refunded: number;
+    refund_amount: number;
+    reason?: string;
+    refunded_by: number;
+    refunded_by_user?: {
+        id: number;
+        name: string;
+    };
+    product?: Product;
+    refunded_at: string;
+    created_at: string;
+    updated_at: string;
+}
+
 export interface TransactionItem {
     id: number;
     transaction_id: number;
@@ -30,6 +49,9 @@ export interface TransactionItem {
     quantity: number;
     price: number;
     subtotal: number;
+    refunded_quantity?: number;
+    refundable_quantity?: number;
+    refunded_items?: RefundedItem[];
     created_at: string;
     updated_at: string;
 }
@@ -42,11 +64,14 @@ export interface Transaction {
     discount: number;
     total: number;
     payment_method: 'cash' | 'gcash';
+    status: 'completed' | 'partial_refund' | 'refunded';
+    total_refunded: number;
     amount_received?: number;
     change?: number;
     gcash_reference?: string;
     completed_at?: string;
     items?: TransactionItem[];
+    refunded_items?: RefundedItem[];
     created_at: string;
     updated_at: string;
 }
@@ -81,4 +106,7 @@ export interface TransactionStats {
     gcash_transactions: number;
     today_revenue: number;
     today_transactions: number;
+    total_refunded?: number;
+    refunded_transactions?: number;
+    partial_refunds?: number;
 }

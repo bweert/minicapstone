@@ -24,7 +24,7 @@ import {
     TrendingUp, TrendingDown, ShoppingBasket, DollarSign, 
     Package, AlertTriangle, User, Receipt, Tags, Users, 
     ArrowRight, Calendar, Banknote, CreditCard, ShoppingCart,
-    ImageIcon, BarChart3
+    ImageIcon, BarChart3, RotateCcw, Wrench
 } from 'lucide-react';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -56,6 +56,12 @@ interface DashboardStats {
     completedRepairs: number;
     cashSales: number;
     gcashSales: number;
+    posRefundedAmount: number;
+    posRefundedCount: number;
+    posPartialRefunds: number;
+    posFullRefunds: number;
+    repairRefundedAmount: number;
+    repairRefundedCount: number;
 }
 
 interface Transaction {
@@ -386,6 +392,72 @@ export default function Dashboard({ stats, recentTransactions, lowStockItems, to
                                         style={{ width: `${(stats?.totalRevenue || 0) > 0 ? ((stats?.gcashSales || 0) / stats.totalRevenue) * 100 : 50}%` }}
                                     />
                                 </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+                </div>
+
+                {/* Refund Statistics */}
+                <div className="grid gap-6 lg:grid-cols-2">
+                    {/* POS Refunds */}
+                    <Card className="border-l-4 border-l-orange-500">
+                        <CardHeader>
+                            <CardTitle className="flex items-center gap-2">
+                                <RotateCcw className="h-5 w-5 text-orange-600" />
+                                POS Refunds (Product Sales)
+                            </CardTitle>
+                            <CardDescription>Refunds from product transactions</CardDescription>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="p-4 rounded-lg bg-orange-50 border border-orange-200">
+                                    <p className="text-sm text-muted-foreground">Total Refunded</p>
+                                    <p className="text-2xl font-bold text-orange-600">{formatCurrency(stats?.posRefundedAmount || 0)}</p>
+                                </div>
+                                <div className="p-4 rounded-lg bg-gray-50 border">
+                                    <p className="text-sm text-muted-foreground">Transactions Affected</p>
+                                    <p className="text-2xl font-bold">{stats?.posRefundedCount || 0}</p>
+                                </div>
+                            </div>
+                            <div className="flex justify-between text-sm">
+                                <div className="flex items-center gap-2">
+                                    <span className="w-3 h-3 rounded-full bg-orange-400"></span>
+                                    <span className="text-muted-foreground">Partial Refund:</span>
+                                    <span className="font-medium">{stats?.posPartialRefunds || 0}</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <span className="w-3 h-3 rounded-full bg-red-500"></span>
+                                    <span className="text-muted-foreground">Fully Refunded:</span>
+                                    <span className="font-medium">{stats?.posFullRefunds || 0}</span>
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+
+                    {/* Repair Refunds */}
+                    <Card className="border-l-4 border-l-red-500">
+                        <CardHeader>
+                            <CardTitle className="flex items-center gap-2">
+                                <Wrench className="h-5 w-5 text-red-600" />
+                                Repair Refunds
+                            </CardTitle>
+                            <CardDescription>Refunds from repair order payments</CardDescription>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="p-4 rounded-lg bg-red-50 border border-red-200">
+                                    <p className="text-sm text-muted-foreground">Total Refunded</p>
+                                    <p className="text-2xl font-bold text-red-600">{formatCurrency(stats?.repairRefundedAmount || 0)}</p>
+                                </div>
+                                <div className="p-4 rounded-lg bg-gray-50 border">
+                                    <p className="text-sm text-muted-foreground">Payments Refunded</p>
+                                    <p className="text-2xl font-bold">{stats?.repairRefundedCount || 0}</p>
+                                </div>
+                            </div>
+                            <div className="p-3 rounded-lg bg-muted/50">
+                                <p className="text-sm text-muted-foreground">
+                                    Combined refunds: <span className="font-medium text-foreground">{formatCurrency((stats?.posRefundedAmount || 0) + (stats?.repairRefundedAmount || 0))}</span>
+                                </p>
                             </div>
                         </CardContent>
                     </Card>

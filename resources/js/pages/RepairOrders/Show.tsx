@@ -1,11 +1,15 @@
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
-import { type RepairOrder } from '@/types/repair';
+import { type RepairOrder, type Payment } from '@/types/repair';
 import { Head, Link, router } from '@inertiajs/react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import {
     Select,
     SelectContent,
@@ -13,6 +17,14 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog';
 import {
     Table,
     TableBody,
@@ -33,6 +45,7 @@ import {
     CreditCard,
     Calendar,
     Save,
+    RotateCcw,
 } from 'lucide-react';
 
 interface Props {
@@ -47,6 +60,11 @@ export default function Show({ order }: Props) {
 
     const [status, setStatus] = useState(order.status);
     const [isUpdating, setIsUpdating] = useState(false);
+    const [isRefundDialogOpen, setIsRefundDialogOpen] = useState(false);
+    const [refundPayment, setRefundPayment] = useState<Payment | null>(null);
+    const [refundAmount, setRefundAmount] = useState('');
+    const [refundReason, setRefundReason] = useState('');
+    const [isRefunding, setIsRefunding] = useState(false);
 
     const formatCurrency = (amount: number) => {
         return new Intl.NumberFormat('en-PH', {
@@ -73,12 +91,118 @@ export default function Show({ order }: Props) {
         );
     };
 
+    const openRefundDialog = (payment: Payment) => {
+        setRefundPayment(payment);
+        setRefundAmount(String(payment.amount));
+        setRefundReason('');
+        setIsRefundDialogOpen(true);
+    };
+
+    const closeRefundDialog = () => {
+        setIsRefundDialogOpen(false);
+        setRefundPayment(null);
+        setRefundAmount('');
+        setRefundReason('');
+    };
+
+    const handleRefundSubmit = () => {
+        if (!refundPayment) return;
+        
+        const amount = parseFloat(refundAmount);
+        if (isNaN(amount) || amount <= 0 || amount > refundPayment.amount) {
+            toast.error('Invalid refund amount');
+            return;
+        }
+
+        setIsRefunding(true);
+        router.post(`/payments/${refundPayment.id}/refund`, {
+            amount: amount,
+            reason: refundReason,
+        }, {
+            preserveScroll: true,
+            onSuccess: () => {
+                toast.success('Payment refunded successfully');
+                closeRefundDialog();
+                setIsRefunding(false);
+            },
+            onError: (errors) => {
+                toast.error(errors.error || 'Failed to process refund');
+                setIsRefunding(false);
+            },
+        });
+    };
+
     const totalPaid = order.payments?.reduce((sum, p) => (p.status === 'paid' ? sum + parseFloat(String(p.amount)) : sum), 0) || 0;
-    const balance = parseFloat(String(order.total_price)) - totalPaid;
+    const totalRefunded = order.payments?.reduce((sum, p) => (p.status === 'refunded' ? sum + parseFloat(String(p.refund_amount || 0)) : sum), 0) || 0;
+    const balance = parseFloat(String(order.total_price)) - totalPaid + totalRefunded;
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={`Order #${order.id.toString().padStart(5, '0')}`} />
+
+            {/* Refund Dialog - Outside the loop */}
+            <Dialog open={isRefundDialogOpen} onOpenChange={setIsRefundDialogOpen}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Refund Payment</DialogTitle>
+                        <DialogDescription>
+                            Process a refund for this payment. This action cannot be undone.
+                        </DialogDescription>
+                    </DialogHeader>
+                    
+                    {refundPayment && (
+                        <div className="space-y-4">
+                            <div className="p-4 bg-muted rounded-lg">
+                                <div className="flex justify-between text-sm">
+                                    <span className="text-muted-foreground">Original Amount</span>
+                                    <span className="font-medium">{formatCurrency(refundPayment.amount)}</span>
+                                </div>
+                                <div className="flex justify-between text-sm mt-1">
+                                    <span className="text-muted-foreground">Payment Method</span>
+                                    <span className="capitalize">{refundPayment.payment_method}</span>
+                                </div>
+                            </div>
+
+                            <div className="space-y-2">
+                                <Label htmlFor="refund-amount">Refund Amount</Label>
+                                <Input
+                                    id="refund-amount"
+                                    type="number"
+                                    step="0.01"
+                                    min="0.01"
+                                    max={refundPayment.amount}
+                                    value={refundAmount}
+                                    onChange={(e) => setRefundAmount(e.target.value)}
+                                    placeholder="Enter refund amount"
+                                />
+                            </div>
+
+                            <div className="space-y-2">
+                                <Label htmlFor="refund-reason">Reason (Optional)</Label>
+                                <Textarea
+                                    id="refund-reason"
+                                    value={refundReason}
+                                    onChange={(e) => setRefundReason(e.target.value)}
+                                    placeholder="Enter reason for refund..."
+                                />
+                            </div>
+                        </div>
+                    )}
+
+                    <DialogFooter>
+                        <Button variant="outline" onClick={closeRefundDialog}>
+                            Cancel
+                        </Button>
+                        <Button 
+                            onClick={handleRefundSubmit}
+                            disabled={isRefunding}
+                            className="bg-red-600 hover:bg-red-700"
+                        >
+                            {isRefunding ? 'Processing...' : 'Process Refund'}
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
 
             <div className="p-6 space-y-6">
                 <div className="flex items-center justify-between">
@@ -152,6 +276,12 @@ export default function Show({ order }: Props) {
                                     <span className="text-muted-foreground">Amount Paid</span>
                                     <span className="text-green-600">{formatCurrency(totalPaid)}</span>
                                 </div>
+                                {totalRefunded > 0 && (
+                                    <div className="flex items-center justify-between text-sm">
+                                        <span className="text-muted-foreground">Total Refunded</span>
+                                        <span className="text-red-600">-{formatCurrency(totalRefunded)}</span>
+                                    </div>
+                                )}
                                 <div className="flex items-center justify-between text-sm font-semibold">
                                     <span>Balance</span>
                                     <span className={balance > 0 ? 'text-red-600' : 'text-green-600'}>
@@ -216,15 +346,46 @@ export default function Show({ order }: Props) {
                                     {order.payments.map((payment) => (
                                         <div
                                             key={payment.id}
-                                            className="flex items-center justify-between p-3 border rounded-lg"
+                                            className={`p-3 border rounded-lg ${payment.status === 'refunded' ? 'bg-red-50 border-red-200' : ''}`}
                                         >
-                                            <div>
-                                                <p className="font-medium">{formatCurrency(payment.amount)}</p>
-                                                <p className="text-xs text-muted-foreground capitalize">
-                                                    {payment.payment_method}
-                                                </p>
+                                            <div className="flex items-center justify-between">
+                                                <div>
+                                                    <p className={`font-medium ${payment.status === 'refunded' ? 'line-through text-muted-foreground' : ''}`}>
+                                                        {formatCurrency(payment.amount)}
+                                                    </p>
+                                                    <p className="text-xs text-muted-foreground capitalize">
+                                                        {payment.payment_method}
+                                                    </p>
+                                                </div>
+                                                <div className="flex items-center gap-2">
+                                                    {payment.status === 'refunded' ? (
+                                                        <Badge variant="destructive" className="gap-1">
+                                                            <RotateCcw className="h-3 w-3" />
+                                                            Refunded
+                                                        </Badge>
+                                                    ) : (
+                                                        <StatusBadge status={payment.status} />
+                                                    )}
+                                                    {payment.status === 'paid' && (
+                                                        <Button 
+                                                            variant="outline" 
+                                                            size="sm"
+                                                            className="text-orange-600 border-orange-300 hover:text-orange-700 hover:bg-orange-50"
+                                                            onClick={() => openRefundDialog(payment)}
+                                                        >
+                                                            Refund
+                                                        </Button>
+                                                    )}
+                                                </div>
                                             </div>
-                                            <StatusBadge status={payment.status} />
+                                            {payment.status === 'refunded' && (
+                                                <div className="mt-2 text-xs text-red-600">
+                                                    <p>Refunded: {formatCurrency(payment.refund_amount || 0)}</p>
+                                                    {payment.refund_reason && (
+                                                        <p>Reason: {payment.refund_reason}</p>
+                                                    )}
+                                                </div>
+                                            )}
                                         </div>
                                     ))}
                                 </div>
