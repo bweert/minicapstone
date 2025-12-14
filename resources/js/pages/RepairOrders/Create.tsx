@@ -57,6 +57,7 @@ export default function Create({ customers, services, spareParts }: Props) {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [partsDialogOpen, setPartsDialogOpen] = useState(false);
     const [activeServiceIndex, setActiveServiceIndex] = useState<number | null>(null);
+    const [partsSearchQuery, setPartsSearchQuery] = useState('');
 
     // Auto-fill price when service is selected
     const handleServiceChange = (index: number, serviceId: string) => {
@@ -87,6 +88,7 @@ export default function Create({ customers, services, spareParts }: Props) {
 
     const openPartsDialog = (serviceIndex: number) => {
         setActiveServiceIndex(serviceIndex);
+        setPartsSearchQuery('');
         setPartsDialogOpen(true);
     };
 
@@ -416,103 +418,152 @@ export default function Create({ customers, services, spareParts }: Props) {
                             Add Spare Parts
                         </DialogTitle>
                         <DialogDescription>
-                            Select spare parts to add to this service
+                            Search and add spare parts to this service
                         </DialogDescription>
                     </DialogHeader>
 
                     <div className="space-y-4 py-4">
-                        {activeServiceIndex !== null &&
-                            serviceEntries[activeServiceIndex]?.parts.map((part, partIndex) => (
-                                <div
-                                    key={partIndex}
-                                    className="grid gap-4 sm:grid-cols-4 items-end p-3 border rounded-lg"
-                                >
-                                    <div className="sm:col-span-2 space-y-2">
-                                        <Label>Part</Label>
-                                        <Select
-                                            value={part.part_id}
-                                            onValueChange={(value) =>
-                                                handlePartChange(
-                                                    activeServiceIndex,
-                                                    partIndex,
-                                                    'part_id',
-                                                    value
-                                                )
-                                            }
-                                        >
-                                            <SelectTrigger>
-                                                <SelectValue placeholder="Select a part" />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                {spareParts.map((sparePart) => (
-                                                    <SelectItem
-                                                        key={sparePart.id}
-                                                        value={sparePart.id.toString()}
-                                                        disabled={sparePart.stock_qty === 0}
-                                                    >
-                                                        {sparePart.name} (Stock: {sparePart.stock_qty})
-                                                    </SelectItem>
-                                                ))}
-                                            </SelectContent>
-                                        </Select>
-                                    </div>
-                                    <div className="space-y-2">
-                                        <Label>Qty</Label>
-                                        <Input
-                                            type="number"
-                                            min="1"
-                                            value={part.quantity}
-                                            onChange={(e) =>
-                                                handlePartChange(
-                                                    activeServiceIndex,
-                                                    partIndex,
-                                                    'quantity',
-                                                    e.target.value
-                                                )
-                                            }
-                                        />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <Label>Unit Price</Label>
-                                        <div className="flex items-center gap-2">
-                                            <Input
-                                                type="number"
-                                                step="0.01"
-                                                value={part.unit_price}
-                                                onChange={(e) =>
-                                                    handlePartChange(
-                                                        activeServiceIndex,
-                                                        partIndex,
-                                                        'unit_price',
-                                                        e.target.value
-                                                    )
-                                                }
-                                            />
-                                            <Button
-                                                type="button"
-                                                variant="ghost"
-                                                size="icon"
-                                                className="text-red-500 shrink-0"
-                                                onClick={() =>
-                                                    removePart(activeServiceIndex, partIndex)
-                                                }
-                                            >
-                                                <X className="h-4 w-4" />
-                                            </Button>
-                                        </div>
-                                    </div>
-                                </div>
-                            ))}
+                        {/* Search Input */}
+                        <div className="space-y-2">
+                            <Label>Search Parts</Label>
+                            <Input
+                                placeholder="Type part name to search..."
+                                value={partsSearchQuery}
+                                onChange={(e) => setPartsSearchQuery(e.target.value)}
+                                autoFocus
+                            />
+                        </div>
 
-                        <Button
-                            type="button"
-                            variant="outline"
-                            onClick={addPart}
-                            className="w-full"
-                        >
-                            <Plus className="mr-2 h-4 w-4" />
-                            Add Part
-                        </Button>
+                        {/* Search Results */}
+                        {partsSearchQuery && (
+                            <div className="border rounded-lg max-h-48 overflow-y-auto">
+                                {spareParts
+                                    .filter(
+                                        (part) =>
+                                            part.name.toLowerCase().includes(partsSearchQuery.toLowerCase()) &&
+                                            part.stock_qty > 0
+                                    )
+                                    .map((part) => {
+                                        const isAlreadyAdded = activeServiceIndex !== null && 
+                                            serviceEntries[activeServiceIndex]?.parts.some(
+                                                (p) => p.part_id === part.id.toString()
+                                            );
+                                        return (
+                                            <div
+                                                key={part.id}
+                                                className={`flex items-center justify-between p-3 border-b last:border-b-0 ${
+                                                    isAlreadyAdded 
+                                                        ? 'bg-muted/50 cursor-not-allowed opacity-60' 
+                                                        : 'hover:bg-muted/50 cursor-pointer'
+                                                }`}
+                                                onClick={() => {
+                                                    if (isAlreadyAdded || activeServiceIndex === null) return;
+                                                    
+                                                    // Double-check to prevent duplicate
+                                                    const alreadyExists = serviceEntries[activeServiceIndex]?.parts.some(
+                                                        (p) => p.part_id === part.id.toString()
+                                                    );
+                                                    if (alreadyExists) {
+                                                        toast.error('Part already added');
+                                                        return;
+                                                    }
+
+                                                    setServiceEntries((prev) => {
+                                                        const newEntries = [...prev];
+                                                        // Check again inside setState to be safe
+                                                        const exists = newEntries[activeServiceIndex].parts.some(
+                                                            (p) => p.part_id === part.id.toString()
+                                                        );
+                                                        if (exists) return prev;
+                                                        
+                                                        newEntries[activeServiceIndex] = {
+                                                            ...newEntries[activeServiceIndex],
+                                                            parts: [
+                                                                ...newEntries[activeServiceIndex].parts,
+                                                                {
+                                                                    part_id: part.id.toString(),
+                                                                    quantity: '1',
+                                                                    unit_price: part.unit_price.toString(),
+                                                                }
+                                                            ]
+                                                        };
+                                                        return newEntries;
+                                                    });
+                                                    setPartsSearchQuery('');
+                                                }}
+                                            >
+                                                <div>
+                                                    <p className="font-medium text-sm">{part.name}</p>
+                                                    <p className="text-xs text-muted-foreground">
+                                                        Stock: {part.stock_qty} | Price: {formatCurrency(part.unit_price)}
+                                                    </p>
+                                                </div>
+                                                {isAlreadyAdded ? (
+                                                    <span className="text-xs text-muted-foreground">Added</span>
+                                                ) : (
+                                                    <Plus className="h-4 w-4 text-green-600" />
+                                                )}
+                                            </div>
+                                        );
+                                    })}
+                                {spareParts.filter(
+                                    (p) => p.name.toLowerCase().includes(partsSearchQuery.toLowerCase()) && p.stock_qty > 0
+                                ).length === 0 && (
+                                    <p className="p-3 text-sm text-muted-foreground text-center">No parts found</p>
+                                )}
+                            </div>
+                        )}
+
+                        {/* Added Parts List */}
+                        {activeServiceIndex !== null && serviceEntries[activeServiceIndex]?.parts.length > 0 && (
+                            <div className="space-y-2">
+                                <Label>Added Parts ({serviceEntries[activeServiceIndex].parts.length})</Label>
+                                <div className="space-y-2">
+                                    {serviceEntries[activeServiceIndex].parts.map((part, partIndex) => {
+                                        const sparePart = spareParts.find((p) => p.id.toString() === part.part_id);
+                                        return (
+                                            <div
+                                                key={partIndex}
+                                                className="flex items-center gap-3 p-3 border rounded-lg bg-muted/30"
+                                            >
+                                                <div className="flex-1">
+                                                    <p className="text-sm font-medium">{sparePart?.name}</p>
+                                                    <p className="text-xs text-muted-foreground">
+                                                        {formatCurrency(parseFloat(part.unit_price))} each
+                                                    </p>
+                                                </div>
+                                                <div className="flex items-center gap-2">
+                                                    <Label className="text-xs">Qty:</Label>
+                                                    <Input
+                                                        type="number"
+                                                        min="1"
+                                                        value={part.quantity}
+                                                        onChange={(e) =>
+                                                            handlePartChange(
+                                                                activeServiceIndex,
+                                                                partIndex,
+                                                                'quantity',
+                                                                e.target.value
+                                                            )
+                                                        }
+                                                        className="w-16 h-8"
+                                                    />
+                                                </div>
+                                                <Button
+                                                    type="button"
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    className="h-8 w-8 text-red-500"
+                                                    onClick={() => removePart(activeServiceIndex, partIndex)}
+                                                >
+                                                    <X className="h-4 w-4" />
+                                                </Button>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+                        )}
                     </div>
 
                     <DialogFooter>

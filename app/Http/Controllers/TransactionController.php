@@ -100,9 +100,9 @@ class TransactionController extends Controller
                     'refunded_at' => now(),
                 ]);
 
-                // Restore product stock
+                // Deduct product stock (don't return it)
                 Product::where('id', $transactionItem->product_id)
-                    ->increment('stock_quantity', $quantityToRefund);
+                    ->decrement('stock_quantity', $quantityToRefund);
             }
 
             // Update transaction total refunded

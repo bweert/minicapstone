@@ -80,6 +80,9 @@ class ProductController extends Controller
                 Storage::disk('public')->delete($product->image);
             }
             $validated['image'] = $request->file('image')->store('products', 'public');
+        } else {
+            // Remove image from validated data to keep existing image
+            unset($validated['image']);
         }
 
         $product->update($validated);

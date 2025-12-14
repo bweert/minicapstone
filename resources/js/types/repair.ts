@@ -65,7 +65,7 @@ export interface Payment {
     id: number;
     repair_order_id: number;
     amount: number;
-    payment_method: 'cash' | 'card' | 'online';
+    payment_method: 'cash' | 'gcash';
     status: 'pending' | 'paid' | 'refunded';
     refund_amount?: number;
     refund_reason?: string;

@@ -15,7 +15,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
-import { ArrowLeft, Save, CreditCard, DollarSign, Banknote, Globe, Receipt } from 'lucide-react';
+import { ArrowLeft, Save, DollarSign, Banknote, Smartphone, Receipt } from 'lucide-react';
 import { StatusBadge } from '@/components/repair';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -229,16 +229,10 @@ export default function Create({ repairOrders, selectedOrder }: Props) {
                                                     Cash
                                                 </div>
                                             </SelectItem>
-                                            <SelectItem value="card">
+                                            <SelectItem value="gcash">
                                                 <div className="flex items-center gap-2">
-                                                    <CreditCard className="h-4 w-4" />
-                                                    Card
-                                                </div>
-                                            </SelectItem>
-                                            <SelectItem value="online">
-                                                <div className="flex items-center gap-2">
-                                                    <Globe className="h-4 w-4" />
-                                                    Online
+                                                    <Smartphone className="h-4 w-4" />
+                                                    GCash
                                                 </div>
                                             </SelectItem>
                                         </SelectContent>

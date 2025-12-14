@@ -419,18 +419,6 @@ export default function Dashboard({ stats, recentTransactions, lowStockItems, to
                                     <p className="text-2xl font-bold">{stats?.posRefundedCount || 0}</p>
                                 </div>
                             </div>
-                            <div className="flex justify-between text-sm">
-                                <div className="flex items-center gap-2">
-                                    <span className="w-3 h-3 rounded-full bg-orange-400"></span>
-                                    <span className="text-muted-foreground">Partial Refund:</span>
-                                    <span className="font-medium">{stats?.posPartialRefunds || 0}</span>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    <span className="w-3 h-3 rounded-full bg-red-500"></span>
-                                    <span className="text-muted-foreground">Fully Refunded:</span>
-                                    <span className="font-medium">{stats?.posFullRefunds || 0}</span>
-                                </div>
-                            </div>
                         </CardContent>
                     </Card>
 
@@ -453,11 +441,6 @@ export default function Dashboard({ stats, recentTransactions, lowStockItems, to
                                     <p className="text-sm text-muted-foreground">Payments Refunded</p>
                                     <p className="text-2xl font-bold">{stats?.repairRefundedCount || 0}</p>
                                 </div>
-                            </div>
-                            <div className="p-3 rounded-lg bg-muted/50">
-                                <p className="text-sm text-muted-foreground">
-                                    Combined refunds: <span className="font-medium text-foreground">{formatCurrency((stats?.posRefundedAmount || 0) + (stats?.repairRefundedAmount || 0))}</span>
-                                </p>
                             </div>
                         </CardContent>
                     </Card>

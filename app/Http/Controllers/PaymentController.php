@@ -41,7 +41,7 @@ class PaymentController extends Controller
         $validated = $request->validate([
             'repair_order_id' => 'required|exists:repair_orders,id',
             'amount' => 'required|numeric|min:0',
-            'payment_method' => 'required|in:cash,card,online',
+            'payment_method' => 'required|in:cash,gcash',
             'status' => 'required|in:paid,pending',
         ]);
 
@@ -72,7 +72,7 @@ class PaymentController extends Controller
     {
         $validated = $request->validate([
             'amount' => 'required|numeric|min:0',
-            'payment_method' => 'required|in:cash,card,online',
+            'payment_method' => 'required|in:cash,gcash',
             'status' => 'required|in:paid,pending',
         ]);
 
