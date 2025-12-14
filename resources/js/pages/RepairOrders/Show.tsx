@@ -73,8 +73,8 @@ export default function Show({ order }: Props) {
         );
     };
 
-    const totalPaid = order.payments?.reduce((sum, p) => (p.status === 'paid' ? sum + p.amount : sum), 0) || 0;
-    const balance = order.total_price - totalPaid;
+    const totalPaid = order.payments?.reduce((sum, p) => (p.status === 'paid' ? sum + parseFloat(String(p.amount)) : sum), 0) || 0;
+    const balance = parseFloat(String(order.total_price)) - totalPaid;
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>

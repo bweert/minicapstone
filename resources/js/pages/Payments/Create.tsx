@@ -47,8 +47,8 @@ export default function Create({ repairOrders, selectedOrder }: Props) {
         if (formData.repair_order_id) {
             const order = repairOrders.find((o) => o.id.toString() === formData.repair_order_id);
             if (order) {
-                const totalPaid = order.payments?.reduce((sum, p) => (p.status === 'paid' ? sum + p.amount : sum), 0) || 0;
-                const balance = order.total_price - totalPaid;
+                const totalPaid = order.payments?.reduce((sum, p) => (p.status === 'paid' ? sum + parseFloat(String(p.amount)) : sum), 0) || 0;
+                const balance = parseFloat(String(order.total_price)) - totalPaid;
                 setFormData((prev) => ({ ...prev, amount: balance.toString() }));
             }
         }
@@ -57,8 +57,8 @@ export default function Create({ repairOrders, selectedOrder }: Props) {
     // Pre-select order from URL
     useEffect(() => {
         if (selectedOrder) {
-            const totalPaid = selectedOrder.payments?.reduce((sum, p) => (p.status === 'paid' ? sum + p.amount : sum), 0) || 0;
-            const balance = selectedOrder.total_price - totalPaid;
+            const totalPaid = selectedOrder.payments?.reduce((sum, p) => (p.status === 'paid' ? sum + parseFloat(String(p.amount)) : sum), 0) || 0;
+            const balance = parseFloat(String(selectedOrder.total_price)) - totalPaid;
             setFormData((prev) => ({
                 ...prev,
                 repair_order_id: selectedOrder.id.toString(),
@@ -109,8 +109,8 @@ export default function Create({ repairOrders, selectedOrder }: Props) {
     };
 
     const selectedOrderDetails = repairOrders.find((o) => o.id.toString() === formData.repair_order_id);
-    const totalPaid = selectedOrderDetails?.payments?.reduce((sum, p) => (p.status === 'paid' ? sum + p.amount : sum), 0) || 0;
-    const balance = selectedOrderDetails ? selectedOrderDetails.total_price - totalPaid : 0;
+    const totalPaid = selectedOrderDetails?.payments?.reduce((sum, p) => (p.status === 'paid' ? sum + parseFloat(String(p.amount)) : sum), 0) || 0;
+    const balance = selectedOrderDetails ? parseFloat(String(selectedOrderDetails.total_price)) - totalPaid : 0;
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -149,8 +149,8 @@ export default function Create({ repairOrders, selectedOrder }: Props) {
                                     </SelectTrigger>
                                     <SelectContent>
                                         {repairOrders.map((order) => {
-                                            const orderPaid = order.payments?.reduce((sum, p) => (p.status === 'paid' ? sum + p.amount : sum), 0) || 0;
-                                            const orderBalance = order.total_price - orderPaid;
+                                            const orderPaid = order.payments?.reduce((sum, p) => (p.status === 'paid' ? sum + parseFloat(String(p.amount)) : sum), 0) || 0;
+                                            const orderBalance = parseFloat(String(order.total_price)) - orderPaid;
                                             return (
                                                 <SelectItem key={order.id} value={order.id.toString()}>
                                                     #{order.id.toString().padStart(5, '0')} - {order.customer?.name} ({formatCurrency(orderBalance)} due)

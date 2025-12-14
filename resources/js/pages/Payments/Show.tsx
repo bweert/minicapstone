@@ -5,6 +5,8 @@ import { Head, Link } from '@inertiajs/react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { StatusBadge } from '@/components/repair';
+import { PaymentReceipt } from '@/components/PaymentReceipt';
+import { useState } from 'react';
 import {
     ArrowLeft,
     Pencil,
@@ -15,6 +17,7 @@ import {
     Globe,
     Calendar,
     Receipt,
+    Printer,
 } from 'lucide-react';
 
 interface Props {
@@ -22,16 +25,18 @@ interface Props {
 }
 
 export default function Show({ payment }: Props) {
+    const [showReceipt, setShowReceipt] = useState(false);
     const breadcrumbs: BreadcrumbItem[] = [
         { title: 'Payments', href: '/payments' },
         { title: `#P${payment.id.toString().padStart(5, '0')}`, href: `/payments/${payment.id}` },
     ];
 
-    const formatCurrency = (amount: number) => {
+    const formatCurrency = (amount: number | string) => {
+        const numAmount = typeof amount === 'string' ? parseFloat(amount) : amount;
         return new Intl.NumberFormat('en-PH', {
             style: 'currency',
             currency: 'PHP',
-        }).format(amount);
+        }).format(numAmount);
     };
 
     const getPaymentMethodIcon = (method: string) => {
@@ -59,12 +64,18 @@ export default function Show({ payment }: Props) {
                             Back to Payments
                         </Link>
                     </Button>
-                    <Button asChild>
-                        <Link href={`/payments/${payment.id}/edit`}>
-                            <Pencil className="mr-2 h-4 w-4" />
-                            Edit Payment
-                        </Link>
-                    </Button>
+                    <div className="flex items-center gap-2">
+                        <Button variant="outline" onClick={() => setShowReceipt(true)}>
+                            <Printer className="mr-2 h-4 w-4" />
+                            Print Receipt
+                        </Button>
+                        <Button asChild>
+                            <Link href={`/payments/${payment.id}/edit`}>
+                                <Pencil className="mr-2 h-4 w-4" />
+                                Edit Payment
+                            </Link>
+                        </Button>
+                    </div>
                 </div>
 
                 <div className="grid gap-6 md:grid-cols-2">
@@ -164,6 +175,13 @@ export default function Show({ payment }: Props) {
                     </Card>
                 </div>
             </div>
+
+            {/* Payment Receipt Modal */}
+            <PaymentReceipt
+                open={showReceipt}
+                onClose={() => setShowReceipt(false)}
+                payment={payment}
+            />
         </AppLayout>
     );
 }

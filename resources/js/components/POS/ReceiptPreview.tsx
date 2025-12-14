@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { CartItem } from '@/hooks/useCart';
-import { Printer, CheckCircle2, X, Banknote, Smartphone, Receipt } from 'lucide-react';
+import { Printer, CheckCircle2, Banknote, Smartphone, Receipt } from 'lucide-react';
 import { useRef } from 'react';
 import { useReactToPrint } from 'react-to-print';
 
@@ -41,8 +41,8 @@ export function ReceiptPreview({
         contentRef: printRef,
         pageStyle: `
       @page {
-        size: 80mm 297mm;
-        margin: 5mm;
+        size: A4;
+        margin: 15mm;
       }
       @media print {
         body {
@@ -88,9 +88,9 @@ export function ReceiptPreview({
                     <div className="text-center space-y-2 pb-4 border-b-2 border-dashed">
                         <div className="flex justify-center">
                             <img
-                                src="/images/public/images/423716193_122100729734197999_6164029439040549086_n.png"
+                                src="/images/423716193_122100729734197999_6164029439040549086_n.png"
                                 alt="Cellub Logo"
-                                className="h-10 w-auto print:h-8"
+                                className="h-16 w-auto print:h-12"
                             />
                         </div>
                         <h2 className="text-xl font-bold text-gray-900">CELLUB</h2>
@@ -191,7 +191,7 @@ export function ReceiptPreview({
                         <p className="text-xs text-gray-500">We appreciate your business. Come visit us again!</p>
                         <div className="pt-2">
                             <p className="text-[10px] text-gray-400">
-                                Powered by Cellub POS System
+                                Powered by Santing
                             </p>
                         </div>
                     </div>
@@ -202,9 +202,8 @@ export function ReceiptPreview({
                     <Button
                         variant="outline"
                         onClick={handleCloseAndReload}
-                        className="flex-1 gap-2"
+                        className="flex-1"
                     >
-                        <X className="w-4 h-4" />
                         Close & New Sale
                     </Button>
                     <Button

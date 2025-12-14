@@ -53,14 +53,14 @@ export default function Index({ payments }: Props) {
     // Calculate stats
     const stats = useMemo(() => {
         const data = payments.data;
-        const totalPaid = data.filter((p) => p.status === 'paid').reduce((sum, p) => sum + p.amount, 0);
-        const totalPending = data.filter((p) => p.status === 'pending').reduce((sum, p) => sum + p.amount, 0);
+        const totalPaid = data.filter((p) => p.status === 'paid').reduce((sum, p) => sum + parseFloat(String(p.amount)), 0);
+        const totalPending = data.filter((p) => p.status === 'pending').reduce((sum, p) => sum + parseFloat(String(p.amount)), 0);
         return {
             total: data.length,
             paid: data.filter((p) => p.status === 'paid').length,
             pending: data.filter((p) => p.status === 'pending').length,
-            totalPaid,
-            totalPending,
+            totalPaid: isNaN(totalPaid) ? 0 : totalPaid,
+            totalPending: isNaN(totalPending) ? 0 : totalPending,
         };
     }, [payments.data]);
 
