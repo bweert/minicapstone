@@ -135,7 +135,7 @@ export function AppSidebar() {
             </SidebarHeader>
 
             <SidebarContent>
-                <NavMain items={navItems} label = "Products and sales " />
+                <NavMain items={navItems} label = "Products and Sales " />
                 <NavMain items={repairNavItems} label="Repair Management" />
             </SidebarContent>
 
